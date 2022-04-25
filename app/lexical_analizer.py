@@ -5,8 +5,12 @@ from .automatas import comment_recognizer, white_space_recognizer, identifier_ke
 
 def source_code_to_lexems(source_code:str):
     tokens=[]
-    pending_source_code=source_code
+    pending_source_code=source_code+" "
     while(len(pending_source_code)>0):
+        pending_source_code,tokens=white_space_recognizer(pending_source_code)
+        if(len(pending_source_code)==0): break
+        
+        #More automatas
         
         pass
     pass
