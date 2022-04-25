@@ -1,29 +1,22 @@
 #!/usr/bin/env python3
 import pytest
 from context import white_space_recognizer,comment_recognizer
+from utils import COMMENT_RECOGNIZER_TEST_CASES,WHITE_SPACE_RECOGNIZER_TEST_CASES
 
 @pytest.mark.parametrize(
-    "line, expected",
-    [
-        ("    if ","if "),
-        ("\tif ","if "),
-        ("\nif ","if "),
-        (" \t \n\n\n\t   \t \nif ","if "),
-    ]
+    "tuple, expected",
+    WHITE_SPACE_RECOGNIZER_TEST_CASES
 )
-def test_white_space_recognizer(line,expected):
-    assert white_space_recognizer(line)==expected
+def test_white_space_recognizer(tuple,expected):
+    pending_code, tokens=tuple
+    assert white_space_recognizer(pending_code, tokens)==expected
     pass
 
 @pytest.mark.parametrize(
-    "line, expected",
-    [
-        ("{fffdfd fd fdfd}if","if"),
-        ("{ }if","if"),
-        ("{}if","if")
-    ]
+    "tuple, expected",
+    COMMENT_RECOGNIZER_TEST_CASES
 )
-def test_comment_recognizer(line,expected):
-    print(line)
-    assert comment_recognizer(line)==expected
+def test_comment_recognizer(tuple,expected):
+    pending_code, tokens=tuple
+    assert comment_recognizer(pending_code, tokens)==expected
     
