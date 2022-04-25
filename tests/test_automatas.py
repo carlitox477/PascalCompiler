@@ -19,4 +19,4 @@ def test_white_space_recognizer(tuple,expected):
 def test_comment_recognizer(tuple,expected):
     pending_code, tokens=tuple
     assert comment_recognizer(pending_code, tokens)==expected
-    
+
