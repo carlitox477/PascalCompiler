@@ -1,0 +1,1 @@
+La idea principal es ir recortando el código fuente de un caracter hasta hallar todos los tokens correspondientes
