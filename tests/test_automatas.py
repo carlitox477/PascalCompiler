@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import pytest
 from context import white_space_recognizer,comment_recognizer
-from utils import COMMENT_RECOGNIZER_TEST_CASES,WHITE_SPACE_RECOGNIZER_TEST_CASES
+from utils import COMMENT_RECOGNIZER_TEST_CASES, WHITE_SPACE_RECOGNIZER_TEST_CASES,IDENTIFIER_TEST_CASES,NUMBER_TEST_CASES,SPECIAL_SYMBOL_CASES,OPERATOR_TEST_CASES,RELATIONAL_OPERATOR_TEST_CASES
 
 @pytest.mark.parametrize(
     "tuple, expected",
