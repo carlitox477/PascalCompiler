@@ -11,7 +11,7 @@ def comment_recognizer(pending_source_code:str)->str:
     if(len(pending_source_code)>0 and pending_source_code[0]=='{'):
         pending_source_code=pending_source_code[1:]
         while pending_source_code[0]!='}': pending_source_code=pending_source_code[1:]
-        pass
+        return pending_source_code[1:]
     return pending_source_code
 
 def identifier_keyword_recognizer(pending_source_code:str,tokens: list)->str:

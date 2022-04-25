@@ -4,4 +4,4 @@ import os
 import sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from app.automatas import white_space_recognizer
+from app.automatas import white_space_recognizer,comment_recognizer
