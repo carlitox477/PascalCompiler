@@ -14,10 +14,10 @@ COMMENT_RECOGNIZER_TEST_CASES=[
 IDENTIFIER_TEST_CASES=[
         (("POLOLO ",[]),(" ",[("TK_identifier","POLOLO")])),
         (("vari ",[]),(" ",[("TK_identifier","vari")])),
-        (("program ",[]),(" ",["TK_program"]))
-        (("integer ",[]),(" ",[('TK_datatype','integer')]))
-        (("boolean ",[]),(" ",[('TK_datatype','boolean')]))
-        (("true ",[]),(" ",[('TK_boolean_literal',1)]))
+        (("program ",[]),(" ",["TK_program"])),
+        (("integer ",[]),(" ",[('TK_datatype','integer')])),
+        (("boolean ",[]),(" ",[('TK_datatype','boolean')])),
+        (("true ",[]),(" ",[('TK_boolean_literal',1)])),
         (("false ",[]),(" ",[('TK_boolean_literal',0)]))
     ]
 
