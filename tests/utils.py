@@ -51,3 +51,8 @@ RELATIONAL_OPERATOR_TEST_CASES=[
     ((">= ",[]),(" ",[("TK_relOp","GEQ")])),
 ]
 
+PARENTHESIS_TEST_CASES=[
+    (("( ",[]),(" ",[("TK_parenthesis","OPPAR")])),
+    ((") ",[]),(" ",[("TK_parenthesis","CLPAR")])),
+]
+
