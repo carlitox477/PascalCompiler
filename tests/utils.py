@@ -22,9 +22,9 @@ IDENTIFIER_TEST_CASES=[
     ]
 
 NUMBER_TEST_CASES=[
-    (("0",[]),("if",[])),
-    (("123",[]),("if",[])),
-    (("0023232",[]),("if",[]))
+    (("0 ",[]),("if",[])),
+    (("123 ",[]),("if",[])),
+    (("0023232 ",[]),("if",[]))
 ]
 
 SPECIAL_SYMBOL_CASES=[
@@ -49,10 +49,12 @@ RELATIONAL_OPERATOR_TEST_CASES=[
     (("<= ",[]),(" ",[("TK_relOp","LEQ")])),
     (("> ",[]),(" ",[("TK_relOp","GT")])),
     ((">= ",[]),(" ",[("TK_relOp","GEQ")])),
+    (("Hello ",[]),("Hello ",[]))
 ]
 
 PARENTHESIS_TEST_CASES=[
     (("( ",[]),(" ",[("TK_parenthesis","OPPAR")])),
     ((") ",[]),(" ",[("TK_parenthesis","CLPAR")])),
+    (("Hello ",[]),("Hello ",[])),
 ]
 
