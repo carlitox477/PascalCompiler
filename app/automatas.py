@@ -19,7 +19,10 @@ def comment_recognizer(pending_source_code:str, tokens: list)->Tuple[str,list]:
 def identifier_keyword_recognizer(pending_source_code:str,tokens: list)-> Tuple[str,list]:
     """Add a keyword/identifier token if it corresponds and return the pending code to anylise"""
     if(len(pending_source_code)>0 and pending_source_code[0] in LETTERS or pending_source_code[0]=='_'):
-        NEXT_VALID_CHARS=pending_source_code[0] in LETTERS.append("_")+DIGITS
+        
+        NEXT_VALID_CHARS=LETTERS+DIGITS
+        NEXT_VALID_CHARS.append("_")
+        
         lexem=pending_source_code[0]
         pending_source_code=pending_source_code[1:]
         
@@ -27,35 +30,53 @@ def identifier_keyword_recognizer(pending_source_code:str,tokens: list)-> Tuple[
             lexem=lexem+pending_source_code[0]
             pending_source_code=pending_source_code[1:]
             pass
-        token=KEYWORD_LEXEM_TO_TOKEN[lexem]
+        token=KEYWORD_LEXEM_TO_TOKEN.get(lexem,False)
         if not(token):
             token=("TK_identifier",lexem)
             pass
-        tokens=tokens.append(token)
+        tokens.append(token)
         pass
     return pending_source_code,tokens
 
 def number_recognizer(pending_source_code:str,tokens: list)->Tuple[str,list]:
     """Add a number token if it corresponds and return the pending code to anylise"""
     lexem=""
+    #Check of first char is zero
+    if(pending_source_code[0]=="0"):
+        lexem="0"
+        pending_source_code=pending_source_code[1:]
+        pass
+    
+    #Erase extra zeros
+    while(len(pending_source_code)>0 and pending_source_code[0]=="0"):
+        pending_source_code=pending_source_code[1:]
+        pass
+    
+    # If previus number were zero and the current is a digit we redefine the lexem value
+    if(pending_source_code[0] in DIGITS):
+        lexem=pending_source_code[0]
+        pending_source_code=pending_source_code[1:]
+        pass
+    
+    #We consider the rest of the numbers
     while(len(pending_source_code)>0 and pending_source_code[0] in DIGITS):
         lexem=lexem+pending_source_code[0]
         pending_source_code=pending_source_code[1:]
         pass
-    if(len(lexem)!=0): tokens=tokens.append(("TK_number",lexem))
+    if(len(lexem)!=0): tokens.append(("TK_number",lexem))
     
     return pending_source_code,tokens
 
 def special_symbol_recognizer(pending_source_code:str,tokens: list)->Tuple[str,list]:
     """Add a special symbol token if it corresponds and return the pending code to anylise"""
     if(len(pending_source_code)>1 and pending_source_code[0:2]==":="):
-        tokens=tokens.append("TK_assignment")
+        tokens.append("TK_assignment")
         return pending_source_code[2:],tokens
     if(len(pending_source_code)>0):
-        token=LEXEM_TO_SPECIAL_SYMBOL_TOKEN[pending_source_code[0]]
+        token=LEXEM_TO_SPECIAL_SYMBOL_TOKEN.get(pending_source_code[0],False)
         
         if(token):
-            tokens=tokens.append(token)
+            tokens.append(token)
             return pending_source_code[1:],tokens
         pass
     return pending_source_code,tokens
@@ -63,9 +84,9 @@ def special_symbol_recognizer(pending_source_code:str,tokens: list)->Tuple[str,l
 def arithmetical_operator_recognizer(pending_source_code:str,tokens: list)->Tuple[str,list]:
     """Add a arithmetical operator token if it corresponds and return the pending code to anylise"""
     if(len(pending_source_code)>0):
-        token=LEXEM_TO_OPERATOR_TOKEN[pending_source_code[0]]
+        token=LEXEM_TO_OPERATOR_TOKEN.get(pending_source_code[0],False)
         if(token):
-            tokens=tokens.append(token)
+            tokens.append(token)
             return pending_source_code[1:],tokens
         pass
     return pending_source_code,tokens
@@ -73,15 +94,15 @@ def arithmetical_operator_recognizer(pending_source_code:str,tokens: list)->Tupl
 def relational_operator_recognizer(pending_source_code:str,tokens: list)-> Tuple[str,list]:
     """Add a relational operator token if it corresponds and return the pending code to anylise"""
     if(len(pending_source_code)>1):
-        token=LEXEM_TO_RELATIONAL_OPERATOR_TOKEN[pending_source_code[0:2]]
+        token=LEXEM_TO_RELATIONAL_OPERATOR_TOKEN.get(pending_source_code[0:2],False)
         if(token):
-            tokens=tokens.append(token)
+            tokens.append(token)
             return pending_source_code[2:],tokens
         pass
     if(len(pending_source_code)>0):
-        token=LEXEM_TO_RELATIONAL_OPERATOR_TOKEN[pending_source_code[0:2]]
+        token=LEXEM_TO_RELATIONAL_OPERATOR_TOKEN.get(pending_source_code[0],False)
         if(token):
-            tokens=tokens.append(token)
+            tokens.append(token)
             return pending_source_code[1:],tokens
         pass
     return pending_source_code,tokens
@@ -90,7 +111,7 @@ def parenthesis_recognizer(pending_source_code:str,tokens: list)->Tuple[str,list
     """Add a parenthesis token if it corresponds and return the pending code to anylise"""
     if(len(pending_source_code)>1):
         if(pending_source_code[0]=="("):
-            tokens=tokens.append(("TK_parenthesis","OPPAR"))
+            tokens.append(("TK_parenthesis","OPPAR"))
             return pending_source_code[1:],tokens
         elif(pending_source_code[0]==")"):
             tokens.append(("TK_parenthesis","CLPAR"))
