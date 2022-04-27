@@ -1,3 +1,6 @@
+from app.lexical_analizer import PASCAL_PROGRAM_PATH
+
+
 WHITE_SPACE_RECOGNIZER_TEST_CASES=[
         (("    if ",[]),("if ",[])),
         (("\tif ",[]),("if ",[])),
@@ -85,4 +88,3 @@ PARENTHESIS_TEST_CASES=[
     ((") ",[]),(" ",[("TK_parenthesis","CLPAR")])),
     (("Hello ",[]),("Hello ",[])),
 ]
-

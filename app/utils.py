@@ -1,12 +1,24 @@
 #!/usr/bin/env python3
 import string
 
+VALID_FILE_EXTENSION=["txt","pas"]
+def read_source_code(file_name:str)->str:    
+    if not(file_name.split(".")[-1] in VALID_FILE_EXTENSION):
+        raise Exception("Invalid extension")
+    
+    source_code =""
+    with open(file_name, 'r+') as program:
+        for line in program:
+            source_code= source_code + line
+            pass
+        pass
+    return source_code
+
 LETTERS= list(string.ascii_lowercase + string.ascii_uppercase)
 DIGITS = list(string.digits)
 SYMBOLS= ['+', '-', '*', '/', '<', '>', '=', '_', ',', ';', ':', '(', ')', '{', '}', '[', ']']
 ESPECIAL_SYMBOLS=['$', '%', '#', '!', '¡', '¿', '?', '"', '"', '&']
 WS=[' ','\n','\t']
-
 
 KEYWORD_LEXEM_TO_TOKEN={
     'program': 'TK_program',
@@ -54,3 +66,16 @@ LEXEM_TO_RELATIONAL_OPERATOR_TOKEN={
     ">=":("TK_relOp","GEQ"),
     
 }
+
+def read_source_code(file_path:str)->str:
+    file_extension=file_path.split(".")[-1]
+    if not(file_extension in VALID_FILE_EXTENSION):
+        raise Exception("Invalid extension")
+    
+    source_code =""
+    with open(file_path, 'r+') as program:
+        for line in program:
+            source_code= source_code + line
+            pass
+        pass
+    return source_code

@@ -6,3 +6,10 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 
 from app.automatas import white_space_recognizer,comment_recognizer,identifier_keyword_recognizer,number_recognizer,special_symbol_recognizer,arithmetical_operator_recognizer,relational_operator_recognizer,parenthesis_recognizer
 from app.utils import read_source_code
+
+VALID_FILE_EXTENSION=["txt","pas"]
+
+def get_pascal_program_file_name_path(file_name:str)->str:
+    return os.path.join(os.path.dirname(__file__),"pascal-programs",file_name)
+    
+
