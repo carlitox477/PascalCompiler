@@ -32,8 +32,10 @@ def identifier_keyword_recognizer(pending_source_code:str,tokens: list)-> Tuple[
             pass
         token=KEYWORD_LEXEM_TO_TOKEN.get(lexem,False)
         if not(token):
-            token=("TK_identifier",lexem)
+            token=("TK_identifier", "pointer")
             pass
+        else:
+            token = (token,)
         tokens.append(token)
         pass
     return pending_source_code,tokens
@@ -63,20 +65,20 @@ def number_recognizer(pending_source_code:str,tokens: list)->Tuple[str,list]:
         lexem=lexem+pending_source_code[0]
         pending_source_code=pending_source_code[1:]
         pass
-    if(len(lexem)!=0): tokens.append(("TK_number",lexem))
+    if(len(lexem)!=0): tokens.append(("TK_number","pointer"))
     
     return pending_source_code,tokens
 
 def special_symbol_recognizer(pending_source_code:str,tokens: list)->Tuple[str,list]:
     """Add a special symbol token if it corresponds and return the pending code to anylise"""
     if(len(pending_source_code)>1 and pending_source_code[0:2]==":="):
-        tokens.append("TK_assignment")
+        tokens.append(("TK_assignment",))
         return pending_source_code[2:],tokens
     if(len(pending_source_code)>0):
         token=LEXEM_TO_SPECIAL_SYMBOL_TOKEN.get(pending_source_code[0],False)
         
         if(token):
-            tokens.append(token)
+            tokens.append((token,))
             return pending_source_code[1:],tokens
         pass
     return pending_source_code,tokens
@@ -96,13 +98,13 @@ def relational_operator_recognizer(pending_source_code:str,tokens: list)-> Tuple
     if(len(pending_source_code)>1):
         token=LEXEM_TO_RELATIONAL_OPERATOR_TOKEN.get(pending_source_code[0:2],False)
         if(token):
-            tokens.append(token)
+            tokens.append((token,))
             return pending_source_code[2:],tokens
         pass
     if(len(pending_source_code)>0):
         token=LEXEM_TO_RELATIONAL_OPERATOR_TOKEN.get(pending_source_code[0],False)
         if(token):
-            tokens.append(token)
+            tokens.append((token,))
             return pending_source_code[1:],tokens
         pass
     return pending_source_code,tokens

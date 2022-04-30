@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 from time import sleep
 from context import white_space_recognizer,comment_recognizer,identifier_keyword_recognizer,relational_operator_recognizer, parenthesis_recognizer,arithmetical_operator_recognizer,special_symbol_recognizer,number_recognizer,read_source_code,get_pascal_program_file_name_path
+import sys
 
-PASCAL_PROGRAM_FILE_NAME="pascal-program.pas"
+PASCAL_PROGRAM_FILE_NAME = sys.argv[1]
 
 
 def source_code_to_lexems(source_code:str):

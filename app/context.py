@@ -10,6 +10,4 @@ from app.utils import read_source_code
 VALID_FILE_EXTENSION=["txt","pas"]
 
 def get_pascal_program_file_name_path(file_name:str)->str:
-    return os.path.join(os.path.dirname(__file__),"pascal-programs",file_name)
-    
-
+    return os.path.join(os.path.dirname(__file__),"",file_name)
