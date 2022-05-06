@@ -17,7 +17,7 @@ def read_source_code(file_name:str)->str:
 LETTERS= list(string.ascii_lowercase + string.ascii_uppercase)
 DIGITS = list(string.digits)
 SYMBOLS= ['+', '-', '*', '/', '<', '>', '=', '_', ',', ';', ':', '(', ')', '{', '}', '[', ']']
-ESPECIAL_SYMBOLS=['$', '%', '#', '!', '¡', '¿', '?', '"', '"', '&']
+ESPECIAL_SYMBOLS=['$', '%', '#', '!', '¡', '¿', '?', '"', '"', '&', '@']
 WS=[' ','\n','\t']
 
 KEYWORD_LEXEM_TO_TOKEN={

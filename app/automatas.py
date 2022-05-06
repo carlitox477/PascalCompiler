@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 from typing import Tuple
-from .utils import LETTERS,DIGITS, WS,KEYWORD_LEXEM_TO_TOKEN,KEYWORD_LEXEM_TO_TOKEN,LEXEM_TO_SPECIAL_SYMBOL_TOKEN,LEXEM_TO_OPERATOR_TOKEN,LEXEM_TO_RELATIONAL_OPERATOR_TOKEN
+from .utils import LETTERS,DIGITS, WS,KEYWORD_LEXEM_TO_TOKEN,KEYWORD_LEXEM_TO_TOKEN,LEXEM_TO_SPECIAL_SYMBOL_TOKEN,LEXEM_TO_OPERATOR_TOKEN,LEXEM_TO_RELATIONAL_OPERATOR_TOKEN, SYMBOLS, ESPECIAL_SYMBOLS
 
 def white_space_recognizer(pending_source_code:str,tokens:list) -> Tuple[str,list]:
     """Eras whitespaces from source code"""
@@ -29,10 +29,12 @@ def identifier_keyword_recognizer(pending_source_code:str,tokens: list)-> Tuple[
         while(len(pending_source_code)>0 and pending_source_code[0] in NEXT_VALID_CHARS):
             lexem=lexem+pending_source_code[0]
             pending_source_code=pending_source_code[1:]
+            if(pending_source_code[0] in ESPECIAL_SYMBOLS):
+                raise Exception("El simbolo", pending_source_code[0]," no está permitido en los identificadores")
             pass
         token=KEYWORD_LEXEM_TO_TOKEN.get(lexem,False)
         if not(token):
-            token=("TK_identifier", "pointer")
+            token=("TK_identifier", lexem)
             pass
         else:
             token = (token,)
@@ -65,7 +67,7 @@ def number_recognizer(pending_source_code:str,tokens: list)->Tuple[str,list]:
         lexem=lexem+pending_source_code[0]
         pending_source_code=pending_source_code[1:]
         pass
-    if(len(lexem)!=0): tokens.append(("TK_number","pointer"))
+    if(len(lexem)!=0): tokens.append(("TK_number", lexem))
     
     return pending_source_code,tokens
 
