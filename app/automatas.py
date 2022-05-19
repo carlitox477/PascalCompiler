@@ -101,13 +101,13 @@ def relational_operator_recognizer(pending_source_code:str,tokens: list)-> Tuple
     if(len(pending_source_code)>1):
         token=LEXEM_TO_RELATIONAL_OPERATOR_TOKEN.get(pending_source_code[0:2],False)
         if(token):
-            tokens.append((token,))
+            tokens.append(token)
             return pending_source_code[2:],tokens
         pass
     if(len(pending_source_code)>0):
         token=LEXEM_TO_RELATIONAL_OPERATOR_TOKEN.get(pending_source_code[0],False)
         if(token):
-            tokens.append((token,))
+            tokens.append(token)
             return pending_source_code[1:],tokens
         pass
     return pending_source_code,tokens

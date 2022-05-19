@@ -195,6 +195,7 @@ def comando_compuesto():
     match_token('TK_begin')
     comando()
     while preanalisis == 'TK_semicolon':
+        match_token('TK_semicolon')
         comando()
     match_token('TK_end')
 
@@ -240,7 +241,7 @@ def resto_llamada_funcion():
     check_attribute(['OPPAR'])
     match_token('TK_parenthesis')
     lista_de_expresiones()
-    check_attribute(['OPPAR'])
+    check_attribute(['CLPAR'])
     match_token('TK_parenthesis')
 
 
@@ -323,7 +324,7 @@ def factor():
     """Simbolo no terminal <factor>"""
     if preanalisis == 'TK_identifier':
         match_token('TK_identifier')
-        if preanalisis == 'TK_parenthesis':
+        if preanalisis == 'TK_parenthesis' and atributo == 'OPPAR':
             resto_llamada_funcion()
     elif preanalisis == 'TK_number':
         match_token('TK_number')
