@@ -4,7 +4,7 @@ from context import white_space_recognizer,comment_recognizer,identifier_keyword
 import sys
 from utils import ESPECIAL_SYMBOLS
 
-PASCAL_PROGRAM_FILE_NAME = sys.argv[1]
+# PASCAL_PROGRAM_FILE_NAME = sys.argv[1]
 
 
 def source_code_to_lexems(source_code:str):
@@ -15,7 +15,7 @@ def source_code_to_lexems(source_code:str):
         if(len(pending_source_code) == 0):
             return tokens
         if(pending_source_code[0] in ESPECIAL_SYMBOLS):
-            raise Exception("Caracter erroneo erroneo")
+            raise Exception("Caracter erroneo: "+pending_source_code[0])
         else:
             pending_source_code, tokens = identifier_keyword_recognizer(pending_source_code, tokens)
             pending_source_code, tokens = special_symbol_recognizer(pending_source_code, tokens)
@@ -29,5 +29,5 @@ def source_code_to_lexems(source_code:str):
         pass
 
 
-source_code=read_source_code(get_pascal_program_file_name_path(PASCAL_PROGRAM_FILE_NAME))
-print(source_code_to_lexems(source_code))
+# source_code=read_source_code(get_pascal_program_file_name_path(PASCAL_PROGRAM_FILE_NAME))
+# print(source_code_to_lexems(source_code))

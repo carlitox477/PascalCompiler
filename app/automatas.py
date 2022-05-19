@@ -27,14 +27,15 @@ def identifier_keyword_recognizer(pending_source_code:str,tokens: list)-> Tuple[
         pending_source_code=pending_source_code[1:]
         
         while(len(pending_source_code)>0 and pending_source_code[0] in NEXT_VALID_CHARS):
-            lexem=lexem+pending_source_code[0]
-            pending_source_code=pending_source_code[1:]
+            lexem = lexem+pending_source_code[0]
+            pending_source_code = pending_source_code[1:]
             if(pending_source_code[0] in ESPECIAL_SYMBOLS):
-                raise Exception("El simbolo", pending_source_code[0]," no está permitido en los identificadores")
+                raise Exception("El simbolo "+ pending_source_code[0] +" no está permitido en los identificadores")
             pass
         token=KEYWORD_LEXEM_TO_TOKEN.get(lexem,False)
         if not(token):
             token=("TK_identifier", lexem)
+        elif token[0] == 'TK_datatype':
             pass
         else:
             token = (token,)
