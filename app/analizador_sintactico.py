@@ -86,10 +86,6 @@ def tipo_de_dato():
 def programa():
     match_token('TK_program')
     match_token('TK_identifier')
-    check_attribute(['OPPAR'])
-    match_token('TK_parenthesis')
-    check_attribute(['CLPAR'])
-    match_token('TK_parenthesis')
     match_token('TK_semicolon')
     bloque()
     if len(lista_pares) == 0:
