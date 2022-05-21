@@ -11,7 +11,6 @@ preanalisis = ''
 atributo = ''
 errorPreanalisis = False
 
-
 def getSiguienteToken():
     """Asigna a preanalisis el siguiente token y al atributo tambien"""
     global lista_pares
@@ -104,6 +103,10 @@ def parte_declaracion_de_variables():
     match_token('TK_var')
     declaracion_de_variables()
     match_token('TK_semicolon')
+    while preanalisis == 'TK_identifier':
+        declaracion_de_variables()
+        match_token('TK_semicolon')
+
 
 
 def declaracion_de_variables():
@@ -276,11 +279,15 @@ def comando_condicional():
 
 def expresion():
     """Simbolo no terminal <expresion>"""
-    expresion_simple()
-    while preanalisis == 'TK_relOp':
-        check_attribute(['GT', 'LT', 'EQ', 'LEQ', 'GEQ', 'DIF'])
-        match_token('TK_relOp')
+    if preanalisis != 'TK_boolean_literal':
         expresion_simple()
+        while preanalisis == 'TK_relOp':
+            check_attribute(['GT', 'LT', 'EQ', 'LEQ', 'GEQ', 'DIF'])
+            match_token('TK_relOp')
+            expresion_simple()
+    else:
+        match_token('TK_boolean_literal')
+
 
 
 def expresion_simple():

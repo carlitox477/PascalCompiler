@@ -35,7 +35,7 @@ def identifier_keyword_recognizer(pending_source_code:str,tokens: list)-> Tuple[
         token=KEYWORD_LEXEM_TO_TOKEN.get(lexem,False)
         if not(token):
             token=("TK_identifier", lexem)
-        elif token[0] == 'TK_datatype':
+        elif token[0] in ['TK_datatype', 'TK_boolean_literal']:
             pass
         else:
             token = (token,)
