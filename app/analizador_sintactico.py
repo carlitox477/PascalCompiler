@@ -3,8 +3,6 @@ from lexical_analizer import source_code_to_lexems, read_source_code
 from context import get_pascal_program_file_name_path
 import sys
 
-# lista_pares = [('TK_program', ), ('TK_identifier', 'num'), ('TK_parenthesis', 'OPPAR'), ('TK_parenthesis', 'CLPAR'), ('TK_semicolon',), ('TK_begin',), ('TK_identifier',), ('TK_end',)]
-
 PASCAL_PROGRAM_FILE_NAME = sys.argv[1]
 source_code = read_source_code(get_pascal_program_file_name_path(PASCAL_PROGRAM_FILE_NAME))
 lista_pares = source_code_to_lexems(source_code)
@@ -13,13 +11,12 @@ preanalisis = ''
 atributo = ''
 errorPreanalisis = False
 
-print(lista_pares)
+
 def getSiguienteToken():
     """Asigna a preanalisis el siguiente token y al atributo tambien"""
     global lista_pares
     global preanalisis
     global atributo
-    print("preanalisis: "+preanalisis+" y atributo:"+atributo+".\n")
     par = lista_pares[0]
     preanalisis = par[0]
     if len(par) == 2:
@@ -50,7 +47,6 @@ def report(lista: list):
 
 def match_token(t: str):
     """se verifica si el simbolo de preanalisis coincide con el terminal t"""
-    # print("Se verifica preanalisis: "+preanalisis+" con el terminal: "+t+"\n")
     global errorPreanalisis
     if preanalisis == t and len(lista_pares) > 0:
         getSiguienteToken()
@@ -61,9 +57,6 @@ def match_token(t: str):
 
 def check_attribute(lista: list):
     """Se verifica si el atributo de preanalisis coincide con algún atributo de la lista Si no coincide entonces reporta un error"""
-    # print("Se verifica atributo: "+atributo+" con la lista: \n")
-    # print(lista)
-    # print("\n")
     if atributo not in lista:
         report(lista)
 
@@ -190,9 +183,10 @@ def comando_compuesto():
     """Simbolo no terminal <comando_compuesto>"""
     match_token('TK_begin')
     comando()
-    while preanalisis == 'TK_semicolon':
-        match_token('TK_semicolon')
+    match_token('TK_semicolon')
+    while preanalisis in ['TK_begin', 'TK_if', 'TK_identifier', 'TK_while', 'TK_read', 'TK_write']:
         comando()
+        match_token('TK_semicolon')
     match_token('TK_end')
 
 
