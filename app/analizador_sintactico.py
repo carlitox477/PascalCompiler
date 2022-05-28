@@ -11,6 +11,7 @@ preanalisis = ''
 atributo = ''
 errorPreanalisis = False
 
+
 def getSiguienteToken():
     """Asigna a preanalisis el siguiente token y al atributo tambien"""
     global lista_pares
@@ -249,8 +250,11 @@ def comando_repetitivo():
 def comando_lectura():
     """simbolo no terminal <comando_lectura>"""
     match_token('TK_read')
+    check_attribute(['OPPAR'])
     match_token('TK_parenthesis')
-    match_token('TK_identifier')
+    # match_token('TK_identifier')
+    expresion_simple()
+    check_attribute(['CLPAR'])
     match_token('TK_parenthesis')
 
 
@@ -259,7 +263,8 @@ def comando_salida():
     match_token('TK_write')
     check_attribute(['OPPAR'])
     match_token('TK_parenthesis')
-    match_token('TK_identifier')
+    # match_token('TK_identifier')
+    expresion_simple()
     check_attribute(['CLPAR'])
     match_token('TK_parenthesis')
 
@@ -334,6 +339,8 @@ def factor():
         expresion()
         check_attribute(['CLPAR'])
         match_token('TK_parenthesis')
+    else:
+        report(['TK_identifier', 'TK_number', 'TK_not_literal', 'TK_parenthesis'])
 
 
 def lista_de_expresiones():
