@@ -9,7 +9,7 @@ TODO
 * ~~*Modificar las reglas write y read (tanto en código como en el informe) para que permitan expresiones dentro (ejemplo: write(1+num)).~~
 * Verificar que en los comentarios se encuentren ambas llaves y en caso de que no este una mostrar un error explicando eso.
 * ~~El programa sintactico no verifica correctamente la declaracion de variables de mas de un tipo (ejemplo: a,b:integer;c:boolean; tira error).~~
-* Al mostrar un error de sintaxis mostrar fila y columna desde donde se produjo.
-* Verificar si es necesario el punto y coma entre ends.
+* ~~Al mostrar un error de sintaxis mostrar fila y columna desde donde se produjo.~~
+* ~~Verificar si es necesario el punto y coma entre ends.~~
 * Realizar test de pruebas con parte de los ejemplos dados.
 * Realizar el informe de la implementación analizador sintactico.
