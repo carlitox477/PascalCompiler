@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from typing import Tuple, List
 from .utils import LETTERS,DIGITS, WS,KEYWORD_LEXEM_TO_TOKEN,KEYWORD_LEXEM_TO_TOKEN,LEXEM_TO_SPECIAL_SYMBOL_TOKEN,LEXEM_TO_OPERATOR_TOKEN,LEXEM_TO_RELATIONAL_OPERATOR_TOKEN, SYMBOLS, ESPECIAL_SYMBOLS
+from exception import SyntaxError
 
 row = 1
 column = 1
@@ -38,56 +39,63 @@ def comment_recognizer(pending_source_code:str, tokens: list)->Tuple[str,list]:
     return pending_source_code,tokens
 
 
-def identifier_keyword_recognizer(pending_source_code:str,tokens: list)-> Tuple[str,list]:
-    """Add a keyword/identifier token if it corresponds and return the pending code to anylise"""
+def identifier_keyword_recognizer(
+        pending_source_code: str, tokens: list) -> Tuple[str, list]:
+    """Add a keyword/identifier token if it corresponds
+        and return the pending code to anylise"""
     global column, row
-    if(len(pending_source_code)>0 and pending_source_code[0] in LETTERS or pending_source_code[0]=='_'):
+    if(len(pending_source_code) > 0 and
+       pending_source_code[0] in LETTERS or pending_source_code[0] == '_'):
 
-        NEXT_VALID_CHARS=LETTERS+DIGITS
+        NEXT_VALID_CHARS = LETTERS+DIGITS
         NEXT_VALID_CHARS.append("_")
 
-        posCol= column
-        posRow= row
-        # print("fila: ",row," columna: ",column," Token: \n")
+        posCol = column
+        posRow = row
 
-        lexem=pending_source_code[0]
-        pending_source_code=pending_source_code[1:]
-        
-        while(len(pending_source_code)>0 and pending_source_code[0] in NEXT_VALID_CHARS):
+        lexem = pending_source_code[0]
+        pending_source_code = pending_source_code[1:]
+        increaseColumn(1)
+
+        while(len(pending_source_code) > 0 and pending_source_code[0] in
+              NEXT_VALID_CHARS):
             lexem = lexem+pending_source_code[0]
             pending_source_code = pending_source_code[1:]
             increaseColumn(1)
             if(pending_source_code[0] in ESPECIAL_SYMBOLS):
-                raise Exception("El simbolo "+ pending_source_code[0] +" no está permitido en los identificadores")
+                print(f'El simbolo {pending_source_code[0]}'
+                      'no está permitido en los identificadores')
+                raise SyntaxError
             pass
-        token=KEYWORD_LEXEM_TO_TOKEN.get(lexem,False)
+        token = KEYWORD_LEXEM_TO_TOKEN.get(lexem, False)
         if not(token):
-            token=("TK_identifier", lexem, (posRow,posCol))
+            token = ("TK_identifier", lexem, (posRow, posCol))
         elif token[0] in ['TK_datatype', 'TK_boolean_literal']:
             token = list(token)
-            token.append((posRow,posCol))
+            token.append((posRow, posCol))
             token = tuple(token)
             pass
         else:
-            token = (token," ",(posRow,posCol))
-        # print(token[0]+"\n")
+            token = (token, " ", (posRow, posCol))
         tokens.append(token)
-    return pending_source_code,tokens
+    return pending_source_code, tokens
 
-def number_recognizer(pending_source_code:str,tokens: list)->Tuple[str,list]:
-    """Add a number token if it corresponds and return the pending code to anylise"""
+
+def number_recognizer(
+        pending_source_code: str, tokens: list) -> Tuple[str, list]:
+    """Add a number token if it corresponds and
+        return the pending code to anylise"""
     global column, row
-    lexem=""
+    lexem = ""
     posRow = row
     posCol = column
-    #Check of first char is zero
-    if(pending_source_code[0]=="0"):
+    # Check of first char is zero
+    if(pending_source_code[0] == "0"):
         lexem="0"
         pending_source_code=pending_source_code[1:]
         increaseColumn(1)
         pass
-    
-    #Erase extra zeros
+    # Erase extra zeros
     while(len(pending_source_code)>0 and pending_source_code[0]=="0"):
         pending_source_code=pending_source_code[1:]
         increaseColumn(1)
@@ -119,10 +127,10 @@ def special_symbol_recognizer(pending_source_code:str,tokens: list)->Tuple[str,l
         increaseColumn(2)
         return pending_source_code[2:],tokens
     if(len(pending_source_code)>0):
-        increaseColumn(1)
         token=LEXEM_TO_SPECIAL_SYMBOL_TOKEN.get(pending_source_code[0],False)
         if(token):
             tokens.append((token, "", (posRow, posCol)))
+            increaseColumn(1)
             return pending_source_code[1:],tokens
     return pending_source_code,tokens
 

@@ -2,11 +2,12 @@
 import sys
 from lexical_analizer import source_code_to_lexems, read_source_code
 from context import get_pascal_program_file_name_path
-from exception import SyntaxError
+# from exception import SyntaxError
 
 lista_pares = []
 preanalisis = ''
 atributo = ''
+errorSintactico = False
 errorPreanalisis = False
 columna = 1
 fila = 1
@@ -28,6 +29,7 @@ def getSiguienteToken() -> None:
 
 def report(lista: list) -> None:
     # Reportar un error de sintaxis
+    global errorSintactico
     esperados = ""
     if len(lista) > 1:
         i = 0
@@ -38,14 +40,15 @@ def report(lista: list) -> None:
                 esperados += ", "
     else:
         esperados = lista[0]
+    errorSintactico = True
     if errorPreanalisis:
         print(f"ERROR de sintaxis: {columna}:{fila}" +
               f" se obtuvo {preanalisis} y se esperaba {esperados}")
-        raise SyntaxError
+        # raise SyntaxError
     else:
         print("ERROR de sintaxis: se obtuvo" +
               f"{atributo} y se esperaba {esperados}")
-        raise SyntaxError
+        # raise SyntaxError
 
 
 def match_token(t: str) -> None:
@@ -85,10 +88,11 @@ def programa() -> None:
     match_token('TK_identifier')
     match_token('TK_semicolon')
     bloque()
-    if len(lista_pares) == 0:
-        print("Programa sin errores sintacticos.")
-    else:
-        print("ERROR de sintaxis: hay sentencias luego del final de programa.")
+    if not errorSintactico:
+        if len(lista_pares) == 0:
+            print("Programa sin errores sintacticos.")
+        else:
+            print("ERROR de sintaxis: hay sentencias luego del final de programa.")
 
 
 def bloque() -> None:
@@ -364,7 +368,6 @@ def main() -> None:
     source_code = read_source_code(get_pascal_program_file_name_path(
         PASCAL_PROGRAM_FILE_NAME))
     lista_pares = source_code_to_lexems(source_code)
-    # print(lista_pares)
     getSiguienteToken()
     programa()
 
