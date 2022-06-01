@@ -88,11 +88,11 @@ def programa() -> None:
     match_token('TK_identifier')
     match_token('TK_semicolon')
     bloque()
-    if not errorSintactico:
-        if len(lista_pares) == 0:
+    if len(lista_pares) == 0:
+        if not errorSintactico:
             print("Programa sin errores sintacticos.")
-        else:
-            print("ERROR de sintaxis: hay sentencias luego del final de programa.")
+    else:
+        print("ERROR de sintaxis: hay sentencias luego del final de programa.")
 
 
 def bloque() -> None:
