@@ -1,32 +1,32 @@
 #!/usr/bin/env python3
+import sys
 from lexical_analizer import source_code_to_lexems, read_source_code
 from context import get_pascal_program_file_name_path
-import sys
+from exception import SyntaxError
 
-PASCAL_PROGRAM_FILE_NAME = sys.argv[1]
-source_code = read_source_code(get_pascal_program_file_name_path(PASCAL_PROGRAM_FILE_NAME))
-lista_pares = source_code_to_lexems(source_code)
-
+lista_pares = []
 preanalisis = ''
 atributo = ''
 errorPreanalisis = False
+columna = 1
+fila = 1
 
 
-def getSiguienteToken():
+def getSiguienteToken() -> None:
     """Asigna a preanalisis el siguiente token y al atributo tambien"""
-    global lista_pares
-    global preanalisis
-    global atributo
+    global lista_pares, preanalisis, atributo, columna, fila
     par = lista_pares[0]
     preanalisis = par[0]
-    if len(par) == 2:
+    if len(par) == 3:
         atributo = par[1]
     else:
         atributo = ''
+    fila = (par[2])[1]
+    columna = (par[2])[0]
     lista_pares = lista_pares[1:]
 
 
-def report(lista: list):
+def report(lista: list) -> None:
     # Reportar un error de sintaxis
     esperados = ""
     if len(lista) > 1:
@@ -38,14 +38,17 @@ def report(lista: list):
                 esperados += ", "
     else:
         esperados = lista[0]
-
     if errorPreanalisis:
-        raise Exception("ERROR de sintaxis: se obtuvo "+preanalisis+" y se esperaba "+esperados)
+        print(f"ERROR de sintaxis: {columna}:{fila}" +
+              f" se obtuvo {preanalisis} y se esperaba {esperados}")
+        raise SyntaxError
     else:
-        raise Exception("ERROR de sintaxis: se obtuvo "+atributo+" y se esperaba "+esperados)
+        print("ERROR de sintaxis: se obtuvo" +
+              f"{atributo} y se esperaba {esperados}")
+        raise SyntaxError
 
 
-def match_token(t: str):
+def match_token(t: str) -> None:
     """se verifica si el simbolo de preanalisis coincide con el terminal t"""
     global errorPreanalisis
     if preanalisis == t and len(lista_pares) > 0:
@@ -55,8 +58,9 @@ def match_token(t: str):
         report([t])
 
 
-def check_attribute(lista: list):
-    """Se verifica si el atributo de preanalisis coincide con algún atributo de la lista Si no coincide entonces reporta un error"""
+def check_attribute(lista: list) -> None:
+    """Se verifica si el atributo de preanalisis coincide con algún atributo de
+    la lista Si no coincide entonces reporta un error"""
     if atributo not in lista:
         report(lista)
 
@@ -65,7 +69,7 @@ def check_attribute(lista: list):
 # Tipos de datos
 
 
-def tipo_de_dato():
+def tipo_de_dato() -> None:
     # print("Preanalisis: "+preanalisis+" y el atributo: "+atributo)
     if preanalisis == 'TK_datatype':
         check_attribute(['integer', 'boolean'])
@@ -76,7 +80,7 @@ def tipo_de_dato():
 # Progamas y bloques
 
 
-def programa():
+def programa() -> None:
     match_token('TK_program')
     match_token('TK_identifier')
     match_token('TK_semicolon')
@@ -87,7 +91,7 @@ def programa():
         print("ERROR de sintaxis: hay sentencias luego del final de programa.")
 
 
-def bloque():
+def bloque() -> None:
     """Simbolo no terminal <bloque>"""
     if preanalisis == 'TK_var':
         parte_declaracion_de_variables()
@@ -99,7 +103,7 @@ def bloque():
 # Declaración de variables
 
 
-def parte_declaracion_de_variables():
+def parte_declaracion_de_variables() -> None:
     """Simbolo no terminal <parte_declaration_de_variables"""
     match_token('TK_var')
     declaracion_de_variables()
@@ -109,15 +113,14 @@ def parte_declaracion_de_variables():
         match_token('TK_semicolon')
 
 
-
-def declaracion_de_variables():
+def declaracion_de_variables() -> None:
     """Simbolo no terminal <declaracion_de_variables>"""
     lista_de_identificadores()
     match_token('TK_colon')
     tipo_de_dato()
 
 
-def lista_de_identificadores():
+def lista_de_identificadores() -> None:
     """Simbolo no terminal <lista_de_identificadores>"""
     while(preanalisis == 'TK_identifier'):
         match_token('TK_identifier')
@@ -127,7 +130,7 @@ def lista_de_identificadores():
 # Declaración de sub-rutinas
 
 
-def parte_declaracion_de_subrutinas():
+def parte_declaracion_de_subrutinas() -> None:
     """Simbolo no terminal <parte_declaracion_de_subrutinas>"""
     while(preanalisis == 'TK_function' or preanalisis == 'TK_procedure'):
         if preanalisis == 'TK_function':
@@ -138,7 +141,7 @@ def parte_declaracion_de_subrutinas():
             match_token('TK_semicolon')
 
 
-def declaracion_de_funcion():
+def declaracion_de_funcion() -> None:
     """Simbolo no terminal <declaracion_de_funcion"""
     match_token('TK_function')
     match_token('TK_identifier')
@@ -154,7 +157,7 @@ def declaracion_de_funcion():
     bloque()
 
 
-def declaracion_de_procedimiento():
+def declaracion_de_procedimiento() -> None:
     """Simbolo no terminal <declaracion_de_procedimiento>"""
     match_token('TK_procedure')
     match_token('TK_identifier')
@@ -166,7 +169,7 @@ def declaracion_de_procedimiento():
     bloque()
 
 
-def parametros_formales():
+def parametros_formales() -> None:
     """Simbolo no terminal <parametros_formales>"""
     seccion_declaracion_de_variables()
     while preanalisis == 'TK_semicolon':
@@ -174,7 +177,7 @@ def parametros_formales():
         seccion_declaracion_de_variables()
 
 
-def seccion_declaracion_de_variables():
+def seccion_declaracion_de_variables() -> None:
     """Simbolo no terminal <seccion_declaracion_de_variables>"""
     if preanalisis == 'TK_var':
         match_token('TK_var')
@@ -183,18 +186,19 @@ def seccion_declaracion_de_variables():
 # Comandos
 
 
-def comando_compuesto():
+def comando_compuesto() -> None:
     """Simbolo no terminal <comando_compuesto>"""
     match_token('TK_begin')
     comando()
     match_token('TK_semicolon')
-    while preanalisis in ['TK_begin', 'TK_if', 'TK_identifier', 'TK_while', 'TK_read', 'TK_write']:
+    while preanalisis in ['TK_begin', 'TK_if',
+                          'TK_identifier', 'TK_while', 'TK_read', 'TK_write']:
         comando()
         match_token('TK_semicolon')
     match_token('TK_end')
 
 
-def comando():
+def comando() -> None:
     """Simbolo no terminal <comando>"""
     if preanalisis == 'TK_begin':
         comando_compuesto()
@@ -210,10 +214,11 @@ def comando():
     elif preanalisis == 'TK_write':
         comando_salida()
     else:
-        report(['TK_begin', 'TK_if', 'TK_identifier', 'TK_while', 'TK_read', 'TK_write'])
+        report(['TK_begin', 'TK_if', 'TK_identifier',
+                'TK_while', 'TK_read', 'TK_write'])
 
 
-def comando2():
+def comando2() -> None:
     """simbolo no terminal <comando'>"""
     if preanalisis == 'TK_comma' or preanalisis == 'TK_assignment':
         resto_asignacion()
@@ -230,7 +235,7 @@ def resto_asignacion():
     expresion()
 
 
-def resto_llamada_funcion():
+def resto_llamada_funcion() -> None:
     """Simbolo no terminal <resto_llamada_funcion>"""
     check_attribute(['OPPAR'])
     match_token('TK_parenthesis')
@@ -239,7 +244,7 @@ def resto_llamada_funcion():
     match_token('TK_parenthesis')
 
 
-def comando_repetitivo():
+def comando_repetitivo() -> None:
     """Simbolo no terminal <comando_repetitivo>"""
     match_token('TK_while')
     expresion()
@@ -247,7 +252,7 @@ def comando_repetitivo():
     comando()
 
 
-def comando_lectura():
+def comando_lectura() -> None:
     """simbolo no terminal <comando_lectura>"""
     match_token('TK_read')
     check_attribute(['OPPAR'])
@@ -258,7 +263,7 @@ def comando_lectura():
     match_token('TK_parenthesis')
 
 
-def comando_salida():
+def comando_salida() -> None:
     """simbolo no terminal <comando_salida>"""
     match_token('TK_write')
     check_attribute(['OPPAR'])
@@ -269,7 +274,7 @@ def comando_salida():
     match_token('TK_parenthesis')
 
 
-def comando_condicional():
+def comando_condicional() -> None:
     """Simbolo no terminal <comando_condicional>"""
     match_token('TK_if')
     expresion()
@@ -282,7 +287,7 @@ def comando_condicional():
 # Operaciones / Expresiones
 
 
-def expresion():
+def expresion() -> None:
     """Simbolo no terminal <expresion>"""
     if preanalisis != 'TK_boolean_literal':
         expresion_simple()
@@ -294,8 +299,7 @@ def expresion():
         match_token('TK_boolean_literal')
 
 
-
-def expresion_simple():
+def expresion_simple() -> None:
     """Simbolo no terminal <expresion_simple>"""
     if preanalisis == 'TK_arithOp':
         check_attribute(['ADD', 'SUB'])
@@ -310,10 +314,12 @@ def expresion_simple():
         termino()
 
 
-def termino():
+def termino() -> None:
     """Simbolo no terminal <termino>"""
     factor()
-    while (preanalisis == 'TK_arithOp' and (atributo == 'MUL' or atributo == 'DIV')) or preanalisis == 'TK_and':
+    while ((preanalisis == 'TK_arithOp' and
+            (atributo == 'MUL' or atributo == 'DIV')) or
+           preanalisis == 'TK_and'):
         if preanalisis == 'TK_arithOp':
             check_attribute(['MUL', 'DIV'])
             match_token('TK_arithOp')
@@ -322,7 +328,7 @@ def termino():
         factor()
 
 
-def factor():
+def factor() -> None:
     """Simbolo no terminal <factor>"""
     if preanalisis == 'TK_identifier':
         match_token('TK_identifier')
@@ -340,10 +346,11 @@ def factor():
         check_attribute(['CLPAR'])
         match_token('TK_parenthesis')
     else:
-        report(['TK_identifier', 'TK_number', 'TK_not_literal', 'TK_parenthesis'])
+        report(['TK_identifier', 'TK_number',
+                'TK_not_literal', 'TK_parenthesis'])
 
 
-def lista_de_expresiones():
+def lista_de_expresiones() -> None:
     """Simbolo no terminal <lista_de_expresiones>"""
     expresion_simple()
     while preanalisis == 'TK_comma':
@@ -351,5 +358,16 @@ def lista_de_expresiones():
         expresion_simple()
 
 
-getSiguienteToken()
-programa()
+def main() -> None:
+    global lista_pares
+    PASCAL_PROGRAM_FILE_NAME = sys.argv[1]
+    source_code = read_source_code(get_pascal_program_file_name_path(
+        PASCAL_PROGRAM_FILE_NAME))
+    lista_pares = source_code_to_lexems(source_code)
+    # print(lista_pares)
+    getSiguienteToken()
+    programa()
+
+
+if __name__ == '__main__':
+    main()
