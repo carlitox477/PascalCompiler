@@ -123,13 +123,13 @@ def special_symbol_recognizer(pending_source_code:str,tokens: list)->Tuple[str,l
     posRow = row
     posCol = column
     if(len(pending_source_code)>1 and pending_source_code[0:2]==":="):
-        tokens.append(("TK_assignment", "", (posRow, posCol)))
+        tokens.append(("TK_assignment", " ", (posRow, posCol)))
         increaseColumn(2)
         return pending_source_code[2:],tokens
     if(len(pending_source_code)>0):
         token=LEXEM_TO_SPECIAL_SYMBOL_TOKEN.get(pending_source_code[0],False)
         if(token):
-            tokens.append((token, "", (posRow, posCol)))
+            tokens.append((token, " ", (posRow, posCol)))
             increaseColumn(1)
             return pending_source_code[1:],tokens
     return pending_source_code,tokens

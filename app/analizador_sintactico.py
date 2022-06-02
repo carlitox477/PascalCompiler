@@ -2,7 +2,7 @@
 import sys
 from lexical_analizer import source_code_to_lexems, read_source_code
 from context import get_pascal_program_file_name_path
-# from exception import SyntaxError
+from exception import SyntaxError
 
 lista_pares = []
 preanalisis = ''
@@ -41,14 +41,14 @@ def report(lista: list) -> None:
     else:
         esperados = lista[0]
     errorSintactico = True
-    if errorPreanalisis:
+    if errorPreanalisis or atributo == ' ':
         print(f"ERROR de sintaxis: {columna}:{fila}" +
               f" se obtuvo {preanalisis} y se esperaba {esperados}")
-        # raise SyntaxError
+        raise SyntaxError
     else:
-        print("ERROR de sintaxis: se obtuvo" +
+        print(f"ERROR de sintaxis: {columna}:{fila} se obtuvo" +
               f"{atributo} y se esperaba {esperados}")
-        # raise SyntaxError
+        raise SyntaxError
 
 
 def match_token(t: str) -> None:
@@ -99,7 +99,7 @@ def bloque() -> None:
     """Simbolo no terminal <bloque>"""
     if preanalisis == 'TK_var':
         parte_declaracion_de_variables()
-    if preanalisis == 'TK_function':
+    if preanalisis == 'TK_function' or preanalisis == 'TK_procedure':
         parte_declaracion_de_subrutinas()
 
     comando_compuesto()
@@ -126,10 +126,13 @@ def declaracion_de_variables() -> None:
 
 def lista_de_identificadores() -> None:
     """Simbolo no terminal <lista_de_identificadores>"""
-    while(preanalisis == 'TK_identifier'):
-        match_token('TK_identifier')
-        if preanalisis == 'TK_comma':
-            match_token('TK_comma')
+    if preanalisis == 'TK_identifier':
+        while(preanalisis == 'TK_identifier'):
+            match_token('TK_identifier')
+            if preanalisis == 'TK_comma':
+                match_token('TK_comma')
+    else:
+        report(['TK_identifier'])
 
 # Declaración de sub-rutinas
 
@@ -260,9 +263,9 @@ def comando_lectura() -> None:
     """simbolo no terminal <comando_lectura>"""
     match_token('TK_read')
     check_attribute(['OPPAR'])
-    match_token('TK_parenthesis')
-    # match_token('TK_identifier')
-    expresion_simple()
+    # match_token('TK_parenthesis')
+    lista_de_identificadores()
+    match_token('TK_identifier')
     check_attribute(['CLPAR'])
     match_token('TK_parenthesis')
 
