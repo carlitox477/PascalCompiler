@@ -263,9 +263,8 @@ def comando_lectura() -> None:
     """simbolo no terminal <comando_lectura>"""
     match_token('TK_read')
     check_attribute(['OPPAR'])
-    # match_token('TK_parenthesis')
+    match_token('TK_parenthesis')
     lista_de_identificadores()
-    match_token('TK_identifier')
     check_attribute(['CLPAR'])
     match_token('TK_parenthesis')
 
@@ -275,7 +274,6 @@ def comando_salida() -> None:
     match_token('TK_write')
     check_attribute(['OPPAR'])
     match_token('TK_parenthesis')
-    # match_token('TK_identifier')
     expresion_simple()
     check_attribute(['CLPAR'])
     match_token('TK_parenthesis')
