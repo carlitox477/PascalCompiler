@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 import sys
+import os
 from lexical_analizer import source_code_to_lexems, read_source_code
 from context import get_pascal_program_file_name_path
-from exception import SyntaxError
+# from exception import SyntaxError
 
 lista_pares = []
 preanalisis = ''
@@ -44,11 +45,12 @@ def report(lista: list) -> None:
     if errorPreanalisis or atributo == ' ':
         print(f"ERROR de sintaxis: {columna}:{fila}" +
               f" se obtuvo {preanalisis} y se esperaba {esperados}")
-        raise SyntaxError
+        # raise SyntaxError
     else:
         print(f"ERROR de sintaxis: {columna}:{fila} se obtuvo" +
               f"{atributo} y se esperaba {esperados}")
-        raise SyntaxError
+        # raise SyntaxError
+    os._exit(0)
 
 
 def match_token(t: str) -> None:
