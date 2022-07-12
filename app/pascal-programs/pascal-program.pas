@@ -3,10 +3,10 @@ var numero, i: integer;
 
 function agregarUno(num: integer):integer;
    begin
-      agregarUno := num +1
+      agregarUno := num +1;
    end;
 
-procedure imprimirCabecera(num);
+procedure imprimirCabecera(num: integer);
    begin
       write(num);
    end;
@@ -14,13 +14,13 @@ procedure imprimirCabecera(num);
 begin
    read(numero);
 
-   imprimirCabecera(numero)
+   imprimirCabecera(numero);
 
    i:= 1;
    while i< 19 do
       begin
-         write(numero+i)
+         write(numero+i);
          i:= agregarUno(i);
       end;
-   write(numero+20)
+   write(numero+20);
 end.

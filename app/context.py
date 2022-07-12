@@ -4,8 +4,10 @@ import os
 import sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from app.automatas import white_space_recognizer,comment_recognizer,identifier_keyword_recognizer,number_recognizer,special_symbol_recognizer,arithmetical_operator_recognizer,relational_operator_recognizer,parenthesis_recognizer
+# Just to export to different files
 from app.utils import read_source_code
+from app.syntax_analizer.syntax_analyzer import use_syntax_analyzer
+
 
 VALID_FILE_EXTENSION=["txt","pas"]
 
