@@ -1,1 +1,3 @@
 from ..utils import LETTERS,DIGITS, WS,KEYWORD_LEXEM_TO_TOKEN,KEYWORD_LEXEM_TO_TOKEN,LEXEM_TO_SPECIAL_SYMBOL_TOKEN,LEXEM_TO_OPERATOR_TOKEN,LEXEM_TO_RELATIONAL_OPERATOR_TOKEN
+from .token import Token
+from ...static_error_analizer.static_error_analyzer import StaticErrorAnalizer

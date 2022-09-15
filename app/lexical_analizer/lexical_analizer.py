@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+from .automatas.automatas import Automata
+from .automatas.token import Token
 from .automatas.automatas import white_space_recognizer,comment_recognizer,identifier_keyword_recognizer,relational_operator_recognizer, parenthesis_recognizer,arithmetical_operator_recognizer,special_symbol_recognizer,number_recognizer
 from .utils import ALPHABET
 
@@ -33,6 +35,7 @@ def getLexicalToken(source_code: str, currentColumn: int, currentRow: int):
         return "",updatedColumn,updatedRow, None
     
     # Check if we find a wierd char
+    # ADD STATIC CHECK
     if(not(pending_source_code[0] in ALPHABET)):
         raise Exception(
             f"Caracter raro: {pending_source_code[0]} en fila {updatedRow}, columna {updatedColumn}")
@@ -68,7 +71,9 @@ def getLexicalToken(source_code: str, currentColumn: int, currentRow: int):
     if(token!=None):
         return pending_source_code, newColumn,newRow,token
     
+    # Just for debuging
     raise Exception(
-            f"Algo raro sucedio en la  fila {newRow}, columna {newColumn}: {pending_source_code[0:20]}")
-    #raise Exception(f"Algo raro sucedio en la  fila {newRow}, columna {newColumn}")
+        f"Algo raro sucedio en la  fila {newRow}, columna {newColumn}: {pending_source_code[0:20]}")
+    pass
+    
     
