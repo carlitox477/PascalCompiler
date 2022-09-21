@@ -5,8 +5,8 @@ import sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 # Just to export to different files
-from app.utils import read_source_code
-from app.syntax_analizer.syntax_analyzer import use_syntax_analyzer
+# from app.utils import read_source_code
+# from app.syntax_analizer.syntax_analyzer import use_syntax_analyzer
 
 
 VALID_FILE_EXTENSION=["txt","pas"]

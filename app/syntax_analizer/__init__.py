@@ -1,8 +1,6 @@
-# from __future__ import absolute_import #Python 2.7
-# from .grammar_rules import basic_rules
-from ..lexical_analizer import lexical_analizer
-from .grammar_rules.program_rule import *
-#from .grammar_rules.declaration_rules import *
-#from .grammar_rules.commands_rules import *
-#from .grammar_rules.expresions_rules import *
-#from .grammar_rules.utils import *
+from .utils import *
+from .gr_commands_rules import *
+from .gr_declaration_rules import *
+from .gr_expresions_rules import *
+from .syntax_error_analyzer import SyntaxErrorAnalyzer
+from .lexical_analizer.automatas.token import Token

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-import string
 
 VALID_FILE_EXTENSION=["txt","pas"]
 def read_source_code(file_name:str)->str:    

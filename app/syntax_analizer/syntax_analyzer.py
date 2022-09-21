@@ -1,5 +1,6 @@
 #from grammar_rules.basic_rules import program_rule
-from .grammar_rules.program_rule import program_rule
+from .gr_program_rule import ProgramRuleRecognizer
 
 def use_syntax_analyzer(source_code:str) -> bool:
-    return program_rule(source_code,1,1)
+    # Create symbol table here and pass it as parameter
+    return ProgramRuleRecognizer.recognize_program_rule(source_code,1,1)
