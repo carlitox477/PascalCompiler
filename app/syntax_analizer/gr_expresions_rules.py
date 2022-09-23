@@ -1,5 +1,5 @@
 from typing import Tuple
-from .utils import check_token, match_token, report_match_error, isTokenInList
+from .utils import check_token, match_token, isTokenInList
 from .syntax_exception import SyntaxException
 
 

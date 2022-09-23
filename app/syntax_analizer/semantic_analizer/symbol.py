@@ -1,3 +1,5 @@
+#from .symbol import Symbol
+
 class Symbol:
     # symbol_type: VAR | FUNCTION | PROCEDURE
     # symbol_name: name of VAR | FUNCTION | PROCEDURE
@@ -10,9 +12,10 @@ class Symbol:
         Args:
             symbol_type(str): VAR | FUNCTION | PROCEDURE
             symbol_name(str): name of identifier
-            parameter_list(list[Symbol]): By default always null, if FUNCTION | PROCEDURE a Symbol list 
+            parameter_list(list[INTEGER | BOOLEAN]): By default always an empty list, if FUNCTION | PROCEDURE a str list 
             output_type(str): INTEGER | BOOLEAN if VAR or FUNCTION, otherwise NULL
             offset(int): position in symbol table where it is in or parameter list (if symbol in parameter list)
+            line(int): where the symbol is
         """
         self.symbol_type = symbol_type
         self.symbol_name = symbol_name
@@ -21,31 +24,78 @@ class Symbol:
         self.offset = offset
         self.line = line
         pass
+
+    def get_signature(self):
+        if(self.symbol_type=="VAR"):
+            return f"{self.symbol_name}[VAR]"
+        if(self.parameter_list== None or len(self.parameter_list)==0):
+            signature = f"{self.symbol_name}()[{self.symbol_type}]"
+            return signature
+
+        parameter_list_str=""
+        for parameter_type in self.parameter_list:
+            parameter_list_str = parameter_list_str + parameter_type + ","
+            pass
+        return f"{self.symbol_name}({parameter_list_str[:-1]})[{self.symbol_type}]"
     
-    def getNumberOfParameters(self) -> int:
+    def get_number_of_parameters(self) -> int:
         """ Gets lenght of parameter_list list """
         return len(self.parameter_list)
     
-    def getSummary(self)-> str:
+    def get_summary(self)-> str:
         """ Gets summary of the symbol """
         return f"{ self.symbol_type } { self.symbol_name }: <RETURNS: {self.output_type}>; <OFFSET: { self.offset }>"
     
-    def getParametersSummary(self):
+
+    def get_parameters_summary(self):
         if(self.parameter_list == None or len(self.parameter_list)==0):
-            return 
+            return ""
         
-        parameter_list=""
-        for symbol in self.parameter_list:
-            parameter_list = parameter_list + symbol.toString() + "; "
+        parameter_list_str=""
+        for parameter_type in self.parameter_list:
+            parameter_list_str = parameter_list_str + parameter_type + ", "
             pass
-        parameter_list=parameter_list[:-2]
-        return f"<PARAMETER_LIST: [{ parameter_list }]>"
+        parameter_list_str=parameter_list_str[:-2] # Erase las "; "
+        return f"<PARAMETER_LIST: [{ parameter_list_str }]>"
     
-    def toString(self)->str:
+    def to_string(self)->str:
         """ Gets all the information of the symbol """
-        summary = self.getSummary()
+        summary = self.get_summary()
         if(self.symbol_type == "VAR"):
             return f"{ summary }"
-        return f"{ summary }; {self.getParametersSummary()}"
-    
+        return f"{ summary }; {self.get_parameters_summary()}"
+
+    def add_parameters(self,parameters:list):
+        for symbol in parameters:
+            self.parameter_list.append(symbol.output_type)
+        pass
+
+    def equal(self,symbol):
+        """ This function is specially useful for function/procedure overload"""
+        
+
+        if self.symbol_name != symbol.symbol_name:
+            return False
+        if self.symbol_type != symbol.symbol_type:
+            return False
+
+        #has_no_parameters= self.parameter_list == None or len(self.parameter_list)== 0
+        #symbol_has_no_parameter = symbol.parameter_list == None or len(symbol.parameter_list)== 0
+
+        #if(has_no_parameters and symbol_has_no_parameter):
+        #    return False
+        try:
+            if(len(self.parameter_list) != len(symbol.parameter_list)):
+                return False
+        except Exception:
+            raise Exception(f"{self.to_string()}")
+
+        # compare parameter types in order, they should be the same type to be equal
+        for i in range(0, len(symbol.parameter_list)):
+            if(symbol.parameter_list[i] != self.parameter_list[i]):
+                return False
+            pass
+        return True
+
+
     pass

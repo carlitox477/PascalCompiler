@@ -1,9 +1,33 @@
 program numerosConsecutivos;
-var numero, i: integer;
+var numero, i: integer; pepito: boolean;
+
+function agregarUno: integer;
+   var numero, i: integer;
+   begin
+      agregarUno := 1;
+   end;
 
 function agregarUno(num: integer):integer;
    begin
       agregarUno := num +1;
+   end;
+   
+procedure agregarUno(num: integer);
+   var numero, i: integer;
+   begin
+      numero:=1;
+   end;
+   
+function agregarUno(num: integer; bol: boolean): boolean;
+   
+   begin
+        agregarUno := true;
+   end;
+   
+procedure agregarUno(bol: boolean; num: integer; agregarUno: boolean);
+   var numero, i: integer;
+   begin
+      numero:=1;
    end;
 
 procedure imprimirCabecera(num: integer);

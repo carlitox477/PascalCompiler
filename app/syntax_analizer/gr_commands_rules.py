@@ -1,6 +1,6 @@
 from typing import Tuple
 
-from app2.syntax_analizer.syntax_exception import SyntaxException
+from .syntax_exception import SyntaxException
 from .utils import check_token, match_token, report_match_error, isTokenInList
 from .gr_expresions_rules import ExpresionRulesRecognizer
 
