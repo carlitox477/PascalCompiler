@@ -48,7 +48,7 @@ class SymbolTable:
         return None
     
     def addSymbol(self, symbol_to_add:Symbol):
-        if self.isInLocalTable2(symbol_to_add):
+        if self.isInLocalTable(symbol_to_add):
             symbol_name=symbol_to_add.symbol_name
             scope_name=self.scope_name
             scope_level= self.scope_level
@@ -60,46 +60,34 @@ class SymbolTable:
         self.offset=self.offset+1
         pass
 
-    def addSymbol2(self, symbol_to_add:Symbol):
-        if self.isInLocalTable(symbol_to_add):
-            symbol_name=symbol_to_add.symbol_name
-            scope_name=self.scope_name
-            scope_level= self.scope_level
-            line = symbol_to_add.line
-            raise SemanticException(f"{ symbol_name } in line {line} is already added in Symbol Table {scope_name}[{scope_level}]")
-        symbol_to_add.offset=self.offset
-        
-        self.scope_content[symbol_to_add.symbol_name]=symbol_to_add
-        self.offset=self.offset+1
-        pass
-
-    def isInLocalTable2(self, symbol_to_add: Symbol)->bool:
-        if symbol_to_add.symbol_name == self.scope_name:
-            if(self.scope_type in ["FUNCTION", "PROGRAM"]):
-                return True
-        
-        if(symbol_to_add.get_signature() in self.scope_content.keys()):
-            return True        
-        return False
-
     def isInLocalTable(self, symbol_to_add: Symbol)->bool:
         if symbol_to_add.symbol_name == self.scope_name:
             if(self.scope_type in ["FUNCTION", "PROGRAM"]):
                 return True
-        if(symbol_to_add.symbol_type== "VAR"):
+        # if function or procedure check there isn't a var with the same name
+        if(symbol_to_add.symbol_type in ["FUNCTION", "PROCEDURE"]):
             for symbol in self.scope_content.values():
-                if(symbol.symbol_type == "VAR" and symbol.symbol_name == symbol_to_add.symbol_name):
-                    return True
-                pass
-        else:
-            for symbol in self.scope_content.values():
-                if(symbol.symbol_type != "VAR" and symbol_to_add.equal(symbol)):
-                    return True
+                if (symbol.symbol_type=="VAR"):
+                    if(symbol.symbol_name == symbol_to_add.symbol_name):
+                        return True
+                    pass
                 pass
             pass
-        
+        elif(symbol_to_add.symbol_type in ["VAR"]):  # Same for var
+            for symbol in self.scope_content.values():
+                if (symbol.symbol_type in ["FUNCTION", "PROCEDURE"]):
+                    if(symbol.symbol_name == symbol_to_add.symbol_name):
+                        return True
+                    pass
+                pass
+            pass
+
+
+
+        if(symbol_to_add.get_signature() in self.scope_content.keys()):
+            return True        
         return False
-    
+
     def get_all_symbols(self):
         return list(self.scope_content.values())
     

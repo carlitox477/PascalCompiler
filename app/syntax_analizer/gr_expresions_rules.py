@@ -19,7 +19,7 @@ class ExpresionRulesRecognizer:
                 current_column(int): Column where the updated look ahead is
                 current_row(int): Row where the updated look ahead is
         """
-        
+        # Return identifier types
         # At list one identifier
         # Tries to find <identificador> 
         pending_source_code,current_column, current_row,identifier_token,_= match_token('TK_identifier',pending_source_code,current_column, current_row,None,True)
@@ -94,6 +94,10 @@ class ExpresionRulesRecognizer:
                 current_column(int): Column where the updated look ahead is
                 current_row(int): Row where the updated look ahead is
         """
+        # literal_booleano means that the expresion type is zero
+        # Both expresion_simple should be the same type
+        # If first expresion_simple is boolean only == and <> are valid
+
         # Tries to find <literal_booleano>
         try:
             pending_source_code,current_column, current_row,_,_=match_token('TK_boolean_literal',pending_source_code,current_column, current_row)
@@ -125,6 +129,8 @@ class ExpresionRulesRecognizer:
                 current_column(int): Column where the updated look ahead is
                 current_row(int): Row where the updated look ahead is
         """
+        # If [+|-] are found, both termino must be integer type and "or" is not allowed
+        # If [+|-] are not found and first <termino> is boolean, or is the only option, and secondo <termino> must be boolean
         try:
             pending_source_code,current_column, current_row,_,_ = match_token('TK_arithOp',pending_source_code,current_column, current_row,{"operation":['ADD', 'SUB']})
         except SyntaxException:
@@ -162,6 +168,8 @@ class ExpresionRulesRecognizer:
                 current_column(int): Column where the updated look ahead is
                 current_row(int): Row where the updated look ahead is
         """
+
+        # First factor type determines if we want an "and" or not, and second factor type
         
         pending_source_code,current_column, current_row=ExpresionRulesRecognizer.verify_factor_rule(pending_source_code,current_column, current_row)
         success_valid_tk_arith_op=check_token('TK_arithOp',pending_source_code,current_column, current_row,{"operation":['MUL', 'DIV']})
@@ -194,7 +202,12 @@ class ExpresionRulesRecognizer:
                 current_column(int): Column where the updated look ahead is
                 current_row(int): Row where the updated look ahead is
         """
-        
+        # Just identifier = Look identifier in symbol table
+        # Just number = integer type
+        # Just function call = get parameters send type and look for function in table, return it type
+        # Not factor = factor type must be boolean
+        # expresion = return its type
+
         valid_first_tokens=['TK_identifier', 'TK_number','TK_not_literal', 'TK_parenthesis']
         
         # <identificador> | <llamada_funcion>
@@ -263,6 +276,7 @@ class ExpresionRulesRecognizer:
                 current_column(int): Column where the updated look ahead is
                 current_row(int): Row where the updated look ahead is
         """
+        # Return list of expresion types
         
         pending_source_code,current_column, current_row=ExpresionRulesRecognizer.verify_simple_expresion_rule(pending_source_code,current_column, current_row)
         
@@ -293,6 +307,8 @@ class ExpresionRulesRecognizer:
                 current_column(int): Column where the updated look ahead is
                 current_row(int): Row where the updated look ahead is
         """
+        # Check correct function call
+        # Compare parameter type sent
         pending_source_code,current_column, current_row,_,_ = match_token('TK_parenthesis',pending_source_code,current_column, current_row,{"type": ['OPPAR']})
         pending_source_code,current_column, current_row = ExpresionRulesRecognizer.verify_expresion_list_rule(pending_source_code,current_column, current_row)
         pending_source_code,current_column, current_row,_,_ = match_token('TK_parenthesis',pending_source_code,current_column, current_row,{"type": ['CLPAR']})

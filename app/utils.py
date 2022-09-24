@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-VALID_FILE_EXTENSION=["txt","pas"]
+VALID_FILE_EXTENSION=["txt","pas","PAS"]
 def read_source_code(file_name:str)->str:    
     if not(file_name.split(".")[-1] in VALID_FILE_EXTENSION):
         raise Exception("Invalid extension")

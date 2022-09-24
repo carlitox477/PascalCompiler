@@ -61,7 +61,7 @@ class DeclarationRulesRecognizer:
             if success:
                 try:
                     pending_source_code,current_column, current_row, _ = DeclarationRulesRecognizer.verify_variables_declaration_rule(pending_source_code,current_column, current_row,symbol_table)
-                except Exception:
+                except SyntaxException:
                     success = False
                 if success:
                     pending_source_code,current_column, current_row,_,_=match_token('TK_semicolon',pending_source_code,current_column, current_row)
@@ -85,7 +85,9 @@ class DeclarationRulesRecognizer:
                 current_row(int): Row where the updated look ahead is
         """
         # Add semantic here to add variables, accumulate identifiers in a list, then add them to table
+        
         pending_source_code,current_column, current_row, identifier_token_list=DeclarationRulesRecognizer.verify_identifier_list_rule(pending_source_code,current_column, current_row)
+        
         pending_source_code,current_column, current_row,_,_=match_token('TK_colon',pending_source_code,current_column, current_row)
         pending_source_code,current_column, current_row,datatype_token=DeclarationRulesRecognizer.verify_datatype_rule(pending_source_code,current_column, current_row)
         
@@ -300,6 +302,7 @@ class DeclarationRulesRecognizer:
         print(function_symbol_table.to_string())
 
         pending_source_code,current_column, current_row,_,_=match_token('TK_semicolon',pending_source_code,current_column, current_row)
+        
         pending_source_code,current_column, current_row=DeclarationRulesRecognizer.verify_block_rule(pending_source_code,current_column, current_row, function_symbol_table)
         return pending_source_code,current_column, current_row
 
@@ -348,8 +351,10 @@ class DeclarationRulesRecognizer:
                 current_column(int): Column where the updated look ahead is
                 current_row(int): Row where the updated look ahead is
         """
+        # Optional
         pending_source_code,current_column,current_row,_,_=match_token('TK_var',pending_source_code,current_column, current_row, [], False)
         pending_source_code,current_column,current_row, variables_symbols=DeclarationRulesRecognizer.verify_variables_declaration_rule(pending_source_code,current_column,current_row,symbol_table)
         return pending_source_code,current_column,current_row,variables_symbols
+        
 
     pass
