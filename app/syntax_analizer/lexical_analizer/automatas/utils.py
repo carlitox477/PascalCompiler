@@ -26,8 +26,8 @@ KEYWORD_LEXEM_TO_TOKEN={
     'read': 'TK_read',
     'write': 'TK_write',
     'not': 'TK_not',
-    'integer': ('TK_datatype','integer'),
-    'boolean': ('TK_datatype','boolean'),
+    'integer': ('TK_datatype','INTEGER'),
+    'boolean': ('TK_datatype','BOOLEAN'),
     'true': ('TK_boolean_literal',1),
     'false': ('TK_boolean_literal',0)
 }

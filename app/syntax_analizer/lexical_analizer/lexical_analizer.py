@@ -51,7 +51,7 @@ class LexicalAnalyzer:
         # Try to find an identifier or reserved word
         pending_source_code, new_column, new_row, token = Automata.recognize_identifier_or_keyword(pending_source_code,  updated_column, updated_row)
         if(token!=None):
-            #if token[0]=="TK_write": print("Write token found")
+            #if token.type=="TK_boolean_literal": print("BOOLEAN LITERAL FOUND")
             return  pending_source_code, new_column, new_row, token
         
         # Try to find a number

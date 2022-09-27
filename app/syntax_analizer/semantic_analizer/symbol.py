@@ -10,12 +10,12 @@ class Symbol:
     def __init__(self,symbol_type: str, symbol_name: str, parameter_list: list, output_type: str, offset: int, line: int) -> None:
         """
         Args:
-            symbol_type(str): VAR | FUNCTION | PROCEDURE
-            symbol_name(str): name of identifier
+            symbol_type(str): VAR | FUNCTION | PROCEDURE | LITERAL
+            symbol_name(str): name of identifier | literal value
             parameter_list(list[INTEGER | BOOLEAN]): By default always an empty list, if FUNCTION | PROCEDURE a str list 
-            output_type(str): INTEGER | BOOLEAN if VAR or FUNCTION, otherwise NULL
-            offset(int): position in symbol table where it is in or parameter list (if symbol in parameter list)
-            line(int): where the symbol is
+            output_type(str): INTEGER | BOOLEAN if VAR, FUNCTION or LITERAL, otherwise NULL
+            offset(int): position in symbol table where it is in or parameter list (if symbol in parameter list) | -1 if Literal
+            line(int): where the symbol | literal is
         """
         self.symbol_type = symbol_type
         self.symbol_name = symbol_name
@@ -27,16 +27,16 @@ class Symbol:
 
     def get_signature(self):
         if(self.symbol_type=="VAR"):
-            return f"{self.symbol_name}[VAR]"
+            return f"{self.symbol_name}"
         if(self.parameter_list== None or len(self.parameter_list)==0):
-            signature = f"{self.symbol_name}()[{self.symbol_type}]"
+            signature = f"{self.symbol_name}()"
             return signature
 
         parameter_list_str=""
         for parameter_type in self.parameter_list:
             parameter_list_str = parameter_list_str + parameter_type + ","
             pass
-        return f"{self.symbol_name}({parameter_list_str[:-1]})[{self.symbol_type}]"
+        return f"{self.symbol_name}({parameter_list_str[:-1]})"
     
     def get_number_of_parameters(self) -> int:
         """ Gets lenght of parameter_list list """

@@ -12,7 +12,8 @@ class SymbolTable:
         parent_symbol_table: Self.__class__,
         scope_content: dict,
         offset: int,
-        line: int
+        line: int,
+        output_type=None
     ) -> None:
         """
         Args:
@@ -31,6 +32,10 @@ class SymbolTable:
         self.scope_content=scope_content
         self.offset=offset
         self.line=line
+        #if scope_type=="FUNCTION":
+        #    self.scope_content[scope_name]=Symbol("VAR",scope_name,[],output_type,offset,line)
+        #    self.offset=1
+        #    pass
         pass
     
     def addSymbolList(self, symbol_list:list):
@@ -39,12 +44,12 @@ class SymbolTable:
             pass
         pass
     
-    def getSymbol(self, symbol_name: str)->Symbol:
-        symbol= self.scope_content[symbol_name]
+    def getSymbol(self, symbol_signature: str)->Symbol:
+        symbol= self.scope_content.get(symbol_signature,None)
         if(symbol != None):
             return symbol
         if(self.parent_symbol_table != None):
-            return self.parent_symbol_table.getSymbol()
+            return self.parent_symbol_table.getSymbol(symbol_signature)
         return None
     
     def addSymbol(self, symbol_to_add:Symbol):
@@ -62,18 +67,25 @@ class SymbolTable:
 
     def isInLocalTable(self, symbol_to_add: Symbol)->bool:
         if symbol_to_add.symbol_name == self.scope_name:
-            if(self.scope_type in ["FUNCTION", "PROGRAM"]):
+            if(self.scope_type == "PROGRAM"):
                 return True
+            elif(self.scope_content.get(self.scope_name,None)!= None):
+                # Every time a function is declered we should add in local table
+                return True
+            else:
+                return False
+
+        if(self.scope_content.get(symbol_to_add.get_signature(),None) != None):
+            return True
+
         # if function or procedure check there isn't a var with the same name
         if(symbol_to_add.symbol_type in ["FUNCTION", "PROCEDURE"]):
             for symbol in self.scope_content.values():
-                if (symbol.symbol_type=="VAR"):
-                    if(symbol.symbol_name == symbol_to_add.symbol_name):
-                        return True
-                    pass
+                if(symbol.symbol_name == symbol_to_add.symbol_name and symbol.symbol_type=="VAR"):
+                    return True
                 pass
             pass
-        elif(symbol_to_add.symbol_type in ["VAR"]):  # Same for var
+        elif(symbol_to_add.symbol_type == "VAR"):  # Same for var
             for symbol in self.scope_content.values():
                 if (symbol.symbol_type in ["FUNCTION", "PROCEDURE"]):
                     if(symbol.symbol_name == symbol_to_add.symbol_name):
@@ -82,13 +94,11 @@ class SymbolTable:
                 pass
             pass
 
-
-
-        if(symbol_to_add.get_signature() in self.scope_content.keys()):
-            return True        
+         
         return False
 
     def get_all_symbols(self):
+        
         return list(self.scope_content.values())
     
     def to_string(self):
@@ -113,4 +123,43 @@ class SymbolTable:
         content = f"{content}\n"
         return f"{name}\n{type}\n{parent_table}\n{line}\n{content}"
 
+
+    def exists_any_accesible_procedure(self,function_name:str):
+        for symbol in self.scope_content.values():
+            if(symbol.symbol_name==function_name):
+                if(symbol.symbol_type== "PROCEDURE"):
+                    return True
+                elif(symbol.symbol_type== "VAR"):
+                    # VAR overshadow function and procedure with same name
+                    return False
+                pass
+            pass
+        
+        parent_table = self.parent_symbol_table
+        response = False
+        while parent_table!= None and not(response):
+            response=parent_table.exists_any_accesible_procedure(function_name)
+            parent_table=parent_table.parent_symbol_table
+            pass
+        return response
+
+    def exists_any_accesible_function(self,function_name:str):
+        for symbol in self.scope_content.values():
+            if(symbol.symbol_name==function_name):
+                if(symbol.symbol_type== "FUNCTION"):
+                    return True
+                elif(symbol.symbol_type== "VAR"):
+                    # VAR overshadow function and procedure with same name
+                    return False
+                pass
+            pass
+        
+        parent_table = self.parent_symbol_table
+        response = False
+        while parent_table!= None and not(response):
+            response=parent_table.exists_any_accesible_function(function_name)
+            parent_table=parent_table.parent_symbol_table
+            pass
+        return response
+    
     pass

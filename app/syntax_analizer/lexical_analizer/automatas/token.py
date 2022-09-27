@@ -39,4 +39,18 @@ class Token:
         if(attributes!= None):
             return True 
         pass
+
+    def to_string(self):
+        type= self.type
+        row= self.row
+        column = self.column
+        attributes = ""
+        for k in self.attributes.keys():
+            attributes=attributes+f"{k}: {self.attributes[k]}; "
+        attributes=attributes[:-2]
+        output=f"{type}(r:{row}, c:{column})"
+        if(len(attributes)>0):
+            output=output+": <"+ attributes+">"
+        
+        return output
     pass

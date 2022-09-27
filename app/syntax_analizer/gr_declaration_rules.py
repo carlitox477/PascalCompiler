@@ -1,8 +1,8 @@
 
 from typing import Tuple
 
-from app.syntax_analizer.semantic_analizer.symbol import Symbol
-from app.syntax_analizer.syntax_exception import SyntaxException
+from syntax_analizer.semantic_analizer.symbol import Symbol
+from syntax_analizer.syntax_exception import SyntaxException
 from .lexical_analizer.automatas.token import Token
 
 from .semantic_analizer.symbol_table import SymbolTable
@@ -28,7 +28,7 @@ class DeclarationRulesRecognizer:
         pending_source_code,current_column, current_row=DeclarationRulesRecognizer.verify_variables_declaration_part_rule(pending_source_code,current_column, current_row,symbol_table)
         pending_source_code,current_column, current_row=DeclarationRulesRecognizer.verify_subrutine_declaration_part_rule(pending_source_code,current_column, current_row,symbol_table)
 
-        pending_source_code,current_column, current_row=CommandRulesRecognizer.verify_compound_command_rule(pending_source_code,current_column, current_row)
+        pending_source_code,current_column, current_row=CommandRulesRecognizer.verify_compound_command_rule(pending_source_code,current_column, current_row,symbol_table)
         return pending_source_code,current_column, current_row
     
     @staticmethod
@@ -48,7 +48,7 @@ class DeclarationRulesRecognizer:
         """
         try:
             pending_source_code,current_column, current_row,_,_=match_token('TK_var',pending_source_code,current_column, current_row)
-        except Exception:
+        except SyntaxException:
             # # Assume non var declaration
             return pending_source_code,current_column, current_row
 
@@ -94,6 +94,7 @@ class DeclarationRulesRecognizer:
         # SEMANTIC
         # Add identifier list to table
         symbols_to_add=create_symbol_list_from_identifier_list(identifier_token_list,datatype_token)
+        
         symbol_table.addSymbolList(symbols_to_add)
         return pending_source_code,current_column, current_row,symbols_to_add
     
@@ -123,8 +124,8 @@ class DeclarationRulesRecognizer:
         # More than one identifier
         while success:
             try:
-                pending_source_code,current_column, current_row,_,_=match_token('TK_comma',pending_source_code,current_column, current_row)
-            except Exception:
+                pending_source_code,current_column, current_row,_,_=match_token('TK_comma',pending_source_code,current_column, current_row,None,True)
+            except SyntaxException:
                 success = False
             if success:
                 pending_source_code,current_column, current_row, identifier_token,_=match_token('TK_identifier',pending_source_code,current_column, current_row)
@@ -169,14 +170,14 @@ class DeclarationRulesRecognizer:
         try:
             match_token('TK_function',pending_source_code,current_column, current_row)
             function_tk_match_success = True
-        except Exception:
+        except SyntaxException:
             function_tk_match_success=False
             
 
         try:
             match_token('TK_procedure',pending_source_code,current_column, current_row)
             procedure_tk_match_success = True
-        except Exception:
+        except SyntaxException:
             procedure_tk_match_success=False
 
         while(function_tk_match_success or procedure_tk_match_success):
@@ -190,13 +191,13 @@ class DeclarationRulesRecognizer:
             try:
                 match_token('TK_function',pending_source_code,current_column, current_row)
                 function_tk_match_success = True
-            except Exception:
+            except SyntaxException:
                 function_tk_match_success=False
 
             try:
                 match_token('TK_procedure',pending_source_code,current_column, current_row)
                 procedure_tk_match_success = True
-            except Exception:
+            except SyntaxException:
                 procedure_tk_match_success=False
             pass
         return pending_source_code,current_column, current_row
@@ -249,8 +250,8 @@ class DeclarationRulesRecognizer:
         pending_source_code,current_column, current_row,_,_=match_token('TK_semicolon',pending_source_code,current_column, current_row)
         pending_source_code,current_column, current_row=DeclarationRulesRecognizer.verify_block_rule(pending_source_code,current_column, current_row, procedure_symbol_table)
         
-        print("---------------------")
-        print(procedure_symbol_table.to_string())
+        #print("---------------------")
+        #print(procedure_symbol_table.to_string())
         return pending_source_code,current_column, current_row
 
     @staticmethod
@@ -278,7 +279,7 @@ class DeclarationRulesRecognizer:
         try:
             pending_source_code,current_column, current_row,_,_=match_token('TK_parenthesis',pending_source_code,current_column, current_row,{"type": ['OPPAR']}, True)
             success= True
-        except Exception:
+        except SyntaxException:
             pass
         
         parameters_symbols=[]
@@ -296,10 +297,16 @@ class DeclarationRulesRecognizer:
         function_symbol=Symbol("FUNCTION", identifier_token.getAttribute("name"),[],None,0,identifier_token.row)
         function_symbol.add_parameters(parameters_symbols)
         function_symbol.output_type=datatype_token.getAttribute("name")
+        
         symbol_table.addSymbol(function_symbol)
-
-        print("---------------------")
-        print(function_symbol_table.to_string())
+        # Add function name as var
+        #print(function_symbol_table.to_string())
+        function_symbol_table.addSymbol(Symbol("VAR",identifier_token.getAttribute("name"),[],function_symbol.output_type,0,function_symbol.line))
+        
+        #print("---------------------")
+        #print(function_symbol_table.to_string())
+        #print("---------------------")
+        #print(symbol_table.to_string())
 
         pending_source_code,current_column, current_row,_,_=match_token('TK_semicolon',pending_source_code,current_column, current_row)
         
@@ -326,7 +333,7 @@ class DeclarationRulesRecognizer:
         while continue_analysis:
             try:
                  pending_source_code,current_column, current_row,_,_=match_token('TK_semicolon',pending_source_code,current_column, current_row)
-            except Exception:
+            except SyntaxException:
                 continue_analysis = False
 
             if continue_analysis:

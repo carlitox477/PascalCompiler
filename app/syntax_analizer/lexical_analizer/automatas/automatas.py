@@ -104,7 +104,9 @@ class Automata:
                 pending_source_code = pending_source_code[1:]
                 new_column += 1
                 pass
-            token_info = KEYWORD_LEXEM_TO_TOKEN.get(lexem, False)
+
+            lower_lexem = lexem.lower()
+            token_info = KEYWORD_LEXEM_TO_TOKEN.get(lower_lexem, False)
             if not(token_info):
                 token = Token("TK_identifier", current_row, current_column, {"name": lexem})
             elif token_info[0] == 'TK_datatype':

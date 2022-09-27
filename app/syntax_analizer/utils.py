@@ -13,10 +13,11 @@ def match_token(searched_token: str, pending_source_code: str, current_column:in
     Verifies if the pre-analysis symbol matches with the terminal_symbol
     """ 
     new_pending_source_code,new_column,new_row,current_token=LexicalAnalyzer.get_lexical_token(pending_source_code,current_column,current_row)
-    
+    #print(current_token.to_string())
+    #SyntaxErrorAnalyzer.verifyExpectedToken(current_token,searched_token,attributes_values,current_row,current_column)
     try:
         SyntaxErrorAnalyzer.verifyExpectedToken(current_token,searched_token,attributes_values,current_row,current_column)
-    except SyntaxException as exception:
+    except Exception as exception:
         if(raise_error):
             raise exception
             #raise Exception(pending_source_code[0:20])
@@ -58,3 +59,14 @@ def create_symbol_list_from_identifier_list(identifier_token_list: list, datatyp
         symbol_list.append(symbol)
         pass
     return symbol_list
+
+
+def get_signature(function_or_procedure_name: str, parameters_datatypes:list):
+    datatypes_str=""
+    for datatype in parameters_datatypes:
+        datatypes_str=datatypes_str+f"{datatype},"
+        pass
+    if(len(datatypes_str)>0):
+        # Case function has non parameters
+        datatypes_str=datatypes_str[:-1]
+    return f"{function_or_procedure_name}({datatypes_str})"
