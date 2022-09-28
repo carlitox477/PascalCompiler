@@ -3,7 +3,9 @@ from .semantic_exception import SemanticException
 from .symbol import Symbol
 # https://ruslanspivak.com/lsbasi-part14/
 
+
 class SymbolTable:
+    label_number=0
     def __init__(
         self,
         scope_name: str,
@@ -13,7 +15,7 @@ class SymbolTable:
         scope_content: dict,
         offset: int,
         line: int,
-        output_type=None
+        paramters_types=[]
     ) -> None:
         """
         Args:
@@ -23,7 +25,8 @@ class SymbolTable:
             parent_symbol_table(SymbolTable | None ): Pointer to parent table. To know where to look if something is not found here. None for global
             scope_content(dic(str -> Symbol)): Dictionary with all VAR, FUNCTION and PROCEDURE inside this FUNCTION/PROCEDURE as symbols. The key is its name
             offset(int): Counter to add new symbols in the table
-            line: Where the function scope is?
+            line: Where the function scope is
+            paramters_types(list[str]): 
         """
         self.scope_name=scope_name
         self.scope_type=scope_type
@@ -32,13 +35,25 @@ class SymbolTable:
         self.scope_content=scope_content
         self.offset=offset
         self.line=line
+        self.label_number=SymbolTable.label_number
+        self.paramters_types=[]
         #self.output_type= None
         #if scope_type=="FUNCTION":
         #    self.scope_content[scope_name]=Symbol("VAR",scope_name,[],output_type,offset,line)
         #    self.offset=1
         #    pass
+        SymbolTable.label_number = SymbolTable.label_number + 1
         pass
     
+    def get_parameter_list_str(self) -> str:
+        parameter_list_str=""
+        if(self.paramters_types== None or len(self.paramters_types)==0):
+            return parameter_list_str
+        for parameter_type in self.paramters_types:
+            parameter_list_str = parameter_list_str + parameter_type + ", "
+            pass
+        return parameter_list_str[:-2]
+
     def addSymbolList(self, symbol_list:list):
         for symbol in symbol_list:
             self.addSymbol(symbol)
@@ -72,6 +87,7 @@ class SymbolTable:
         self_symbol.offset=self.offset
         self.scope_content[self_symbol_copy.get_signature()]=self_symbol
         self.offset=self.offset+1
+        self.paramters_types=self_symbol.parameter_list.copy()
         pass
 
     def isInLocalTable(self, symbol_to_add: Symbol)->bool:
@@ -171,4 +187,6 @@ class SymbolTable:
             pass
         return response
     
+    def get_label(self):
+        return f"l{self.label_number}_{self.scope_name}({self.get_parameter_list_str()})[{self.scope_level}]"
     pass

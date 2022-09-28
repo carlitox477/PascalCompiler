@@ -55,7 +55,7 @@ class Symbol:
         for parameter_type in self.parameter_list:
             parameter_list_str = parameter_list_str + parameter_type + ", "
             pass
-        parameter_list_str=parameter_list_str[:-2] # Erase las "; "
+        parameter_list_str=parameter_list_str[:-2] # Erase las ", "
         return f"<PARAMETER_LIST: [{ parameter_list_str }]>"
     
     def to_string(self)->str:

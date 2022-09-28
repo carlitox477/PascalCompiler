@@ -283,7 +283,7 @@ class MepaWriter:
         self.file.write("INPP\n")
         pass
     
-    def enter(self, procedure_level: int):
+    def enter(self, procedure_level: int, label: str):
         """
             Write ENPR procedure_level.
             Do:
@@ -292,7 +292,7 @@ class MepaWriter:
                 2. HEAP[TOP] = DISPLAY[procedure_level]
                 3. DISPLAY[procedure_level] = TOP + 1
         """
-        self.file.write(f"ENPR {procedure_level}\n")
+        self.file.write(f"{label} ENPR {procedure_level}\n")
         pass
     
     def call(self, procedure_label: int):

@@ -18,7 +18,7 @@ class ProgramRuleRecognizer:
         program_table = SymbolTable(program_identifier_token.getAttribute("name"),"PROGRAM",0,None,{},0,current_row)
         mepa_writer.init()
 
-        pending_source_code,current_column, current_row = DeclarationRulesRecognizer.verify_block_rule(pending_source_code,current_column, current_row, program_table,mepa_writer)
+        pending_source_code,current_column, current_row = DeclarationRulesRecognizer.verify_block_rule(pending_source_code,current_column, current_row, program_table,mepa_writer,True)
         
         pending_source_code,current_column, current_row,_,_ = match_token('TK_dot',pending_source_code,current_column, current_row)
         mepa_writer.halt()
