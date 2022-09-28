@@ -1,5 +1,7 @@
 
 from typing import Tuple
+
+from app.syntax_analizer.mepa_writer import MepaWriter
 from .lexical_analizer.automatas.token import Token
 
 from .semantic_analizer.symbol_table import SymbolTable
@@ -11,7 +13,7 @@ from .gr_expresions_rules import ExpresionRulesRecognizer
 
 class CommandRulesRecognizer:
     @staticmethod
-    def verify_compound_command_rule(pending_source_code:str,current_column:int, current_row:int, symbol_table:SymbolTable) -> Tuple[str,int,int]:
+    def verify_compound_command_rule(pending_source_code:str,current_column:int, current_row:int, symbol_table:SymbolTable, mepa_writer: MepaWriter) -> Tuple[str,int,int]:
         """
         Identifies rule: <comando_compuesto> ::= begin <comando> ; {<comando> ;} end
             
@@ -27,14 +29,14 @@ class CommandRulesRecognizer:
         """
         pending_source_code,current_column, current_row,_,_=match_token('TK_begin',pending_source_code,current_column, current_row)
         
-        pending_source_code,current_column, current_row=CommandRulesRecognizer.verify_command(pending_source_code,current_column, current_row,symbol_table)
+        pending_source_code,current_column, current_row=CommandRulesRecognizer.verify_command(pending_source_code,current_column, current_row,symbol_table,mepa_writer)
         pending_source_code,current_column, current_row,_,_=match_token('TK_semicolon',pending_source_code,current_column, current_row)
         
         valid_first_tokens=['TK_begin', 'TK_if','TK_identifier', 'TK_while', 'TK_read', 'TK_write']
         #isTokenInList(pending_source_code,current_column, current_row,valid_first_tokens)
         
         while isTokenInList(pending_source_code,current_column, current_row,valid_first_tokens):
-            pending_source_code,current_column, current_row=CommandRulesRecognizer.verify_command(pending_source_code,current_column, current_row,symbol_table)
+            pending_source_code,current_column, current_row=CommandRulesRecognizer.verify_command(pending_source_code,current_column, current_row,symbol_table,mepa_writer)
             pending_source_code,current_column, current_row,_,_=match_token('TK_semicolon',pending_source_code,current_column, current_row)
             pass
             
@@ -42,7 +44,7 @@ class CommandRulesRecognizer:
         return pending_source_code,current_column, current_row
     
     @staticmethod
-    def verify_command(pending_source_code:str,current_column:int, current_row:int, symbol_table: SymbolTable) -> Tuple[str,int,int]:
+    def verify_command(pending_source_code:str,current_column:int, current_row:int, symbol_table: SymbolTable, mepa_writer: MepaWriter) -> Tuple[str,int,int]:
         """
         Identifies rule: <comando> ::= <comando_condicional> | <comando_compuesto> | <identificador> <comando'> | <comando_repetitivo> | <comando_lectura> | <comando_salida>
             
@@ -57,10 +59,10 @@ class CommandRulesRecognizer:
                 current_row(int): Row where the updated look ahead is
         """
         if check_token('TK_begin',pending_source_code,current_column, current_row):
-            return CommandRulesRecognizer.verify_compound_command_rule(pending_source_code,current_column, current_row,symbol_table)
+            return CommandRulesRecognizer.verify_compound_command_rule(pending_source_code,current_column, current_row,symbol_table, mepa_writer)
 
         if check_token('TK_if',pending_source_code,current_column, current_row):
-            return CommandRulesRecognizer.verify_conditional_command_rule(pending_source_code,current_column, current_row,symbol_table)
+            return CommandRulesRecognizer.verify_conditional_command_rule(pending_source_code,current_column, current_row,symbol_table, mepa_writer)
 
         if check_token('TK_identifier',pending_source_code,current_column, current_row):
             pending_source_code,current_column, current_row,identifier_token,_=match_token('TK_identifier',pending_source_code,current_column, current_row)            
@@ -68,7 +70,7 @@ class CommandRulesRecognizer:
             return CommandRulesRecognizer.verify_command_2_rule(pending_source_code,current_column, current_row,symbol_table,identifier_token)
         
         if check_token('TK_while',pending_source_code,current_column, current_row):
-            return CommandRulesRecognizer.verify_repetitive_command_rule(pending_source_code,current_column, current_row,symbol_table)
+            return CommandRulesRecognizer.verify_repetitive_command_rule(pending_source_code,current_column, current_row,symbol_table, mepa_writer)
         
         if check_token('TK_read',pending_source_code,current_column, current_row):
             return ExpresionRulesRecognizer.verify_lecture_command_rule(pending_source_code,current_column,current_row, symbol_table)
@@ -79,7 +81,7 @@ class CommandRulesRecognizer:
         raise Exception(f"SYNTAX ERROR: Expected to find a token in {['TK_begin', 'TK_if', 'TK_identifier', 'TK_while', 'TK_read', 'TK_write']}, but found other in row {current_row}, column {current_column}: {pending_source_code[0:20]}")
 
     @staticmethod
-    def verify_conditional_command_rule(pending_source_code:str,current_column:int, current_row:int, symbol_table:SymbolTable) -> Tuple[str,int,int]:
+    def verify_conditional_command_rule(pending_source_code:str,current_column:int, current_row:int, symbol_table:SymbolTable,mepa_writer: MepaWriter) -> Tuple[str,int,int]:
         """
         Identifies rule: <comando_condicional> ::= if <expresion> then <comando> [ else <comando> ]
             
@@ -96,7 +98,7 @@ class CommandRulesRecognizer:
         pending_source_code,current_column, current_row,_,_ = match_token('TK_if',pending_source_code,current_column, current_row)
         pending_source_code,current_column, current_row,_ = ExpresionRulesRecognizer.verify_expresion_rule(pending_source_code,current_column, current_row,symbol_table,"BOOLEAN")
         pending_source_code,current_column, current_row,_,_ = match_token('TK_then',pending_source_code,current_column, current_row)
-        pending_source_code,current_column, current_row = CommandRulesRecognizer.verify_command(pending_source_code,current_column, current_row,symbol_table)
+        pending_source_code,current_column, current_row = CommandRulesRecognizer.verify_command(pending_source_code,current_column, current_row,symbol_table,mepa_writer)
         
         success_tk_else = True
         try:
@@ -104,12 +106,12 @@ class CommandRulesRecognizer:
         except SyntaxException:
             success_tk_else= False
         if success_tk_else:
-            pending_source_code,current_column, current_row=CommandRulesRecognizer.verify_command(pending_source_code,current_column, current_row,symbol_table)
+            pending_source_code,current_column, current_row=CommandRulesRecognizer.verify_command(pending_source_code,current_column, current_row,symbol_table,mepa_writer)
             pass
         return pending_source_code,current_column, current_row
 
     @staticmethod
-    def verify_repetitive_command_rule(pending_source_code:str,current_column:int, current_row:int, symbol_table: SymbolTable) -> Tuple[str,int,int]:
+    def verify_repetitive_command_rule(pending_source_code:str,current_column:int, current_row:int, symbol_table: SymbolTable, mepa_writer: MepaWriter) -> Tuple[str,int,int]:
         """
         Identifies rule: <comando_repetitivo> ::= while <expresion> do <comando>
             
@@ -126,7 +128,7 @@ class CommandRulesRecognizer:
         pending_source_code,current_column,current_row,_,_ = match_token('TK_while',pending_source_code,current_column,current_row)
         pending_source_code,current_column,current_row,_= ExpresionRulesRecognizer.verify_expresion_rule(pending_source_code,current_column,current_row,symbol_table,"BOOLEAN")
         pending_source_code,current_column,current_row,_,_ = match_token('TK_do',pending_source_code,current_column,current_row)
-        pending_source_code,current_column,current_row = CommandRulesRecognizer.verify_command(pending_source_code,current_column,current_row)
+        pending_source_code,current_column,current_row = CommandRulesRecognizer.verify_command(pending_source_code,current_column,current_row, mepa_writer)
         return pending_source_code,current_column,current_row
 
     @staticmethod

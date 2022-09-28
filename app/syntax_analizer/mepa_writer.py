@@ -7,10 +7,18 @@ from io import TextIOWrapper
 # LABEL_HASHMAP = Hashmap which allow us to look for an instruction based in a label name
 
 class MepaWriter:
+    
+    def __init__(self, file: TextIOWrapper) -> None:
+        self.top_write_pointer=0
+        self.file = file
+        pass
+
+    def close_file(self) -> None:
+        self.file.close()
+        pass
 
     # Artihmetical operations
-    @staticmethod
-    def add(file: TextIOWrapper):
+    def add(self):
         """
             Write SUMA.
             Do:
@@ -18,11 +26,10 @@ class MepaWriter:
                 1. HEAP[TOP - 1] = HEAP[TOP - 1] + HEAP[TOP ]
                 2. TOP = TOP - 1
         """
-        file.write("ADD")
+        self.file.write("ADD\n")
         pass
 
-    @staticmethod
-    def sub(file: TextIOWrapper):
+    def sub(self):
         """
             Write SUST.
             Do:
@@ -30,11 +37,10 @@ class MepaWriter:
                 1. HEAP[TOP - 1] = HEAP[TOP - 1] - HEAP[TOP ]
                 2. TOP = TOP - 1
         """
-        file.write("SUST")
+        self.file.write("SUST\n")
         pass
 
-    @staticmethod
-    def mul(file: TextIOWrapper):
+    def mul(self):
         """
             Write MULT.
             Do:
@@ -42,11 +48,10 @@ class MepaWriter:
                 1. HEAP[TOP - 1] = HEAP[TOP - 1] * HEAP[TOP ]
                 2. TOP = TOP - 1
         """
-        file.write("MULT")
+        self.file.write("MULT\n")
         pass
 
-    @staticmethod
-    def div(file: TextIOWrapper):
+    def div(self):
         """
             Write DIVI.
             Do:
@@ -54,11 +59,10 @@ class MepaWriter:
                 1. HEAP[TOP - 1] = HEAP[TOP - 1] / HEAP[TOP ]
                 2. TOP = TOP - 1
         """
-        file.write("ADD")
+        self.file.write("DIVI\n")
         pass
 
-    @staticmethod
-    def mod(file: TextIOWrapper):
+    def mod(self):
         """
             Write MODU.
             Do:
@@ -66,23 +70,21 @@ class MepaWriter:
                 1. HEAP[TOP - 1] = HEAP[TOP - 1] MOD HEAP[TOP ]
                 2. TOP = TOP - 1
         """
-        file.write("MODU")
+        self.file.write("MODU\n")
         pass
 
-    @staticmethod
-    def uminus(file: TextIOWrapper):
+    def uminus(self):
         """
             Write UMEN.
             Do:
 
                 1. HEAP[TOP] = -HEAP[TOP]
         """
-        file.write("UMEN")
+        self.file.write("UMEN\n")
         pass
 
     # Logical operations
-    @staticmethod
-    def _and(file: TextIOWrapper):
+    def _and(self):
         """
             Write CONJ.
             Do:
@@ -90,11 +92,10 @@ class MepaWriter:
                 1. IF HEAP[TOP - 1] = 1 AND HEAP[TOP] = 1 THEN HEAP[TOP - 1] = 1; ELSE HEAP[TOP - 1] = 0 
                 2. TOP = TOP - 1
         """
-        file.write("CONJ")
+        self.file.write("CONJ\n")
         pass
 
-    @staticmethod
-    def _or(file: TextIOWrapper):
+    def _or(self):
         """
             Write DISJ.
             Do:
@@ -102,23 +103,21 @@ class MepaWriter:
                 1. IF HEAP[TOP - 1] = 1 or HEAP[TOP] = 1 THEN HEAP[TOP - 1] = 1; ELSE HEAP[TOP - 1] = 0 
                 2. TOP = TOP - 1
         """
-        file.write("DISJ")
+        self.file.write("DISJ\n")
         pass
 
-    @staticmethod
-    def _not(file: TextIOWrapper):
+    def _not(self):
         """
             Write NEGA.
             Do:
 
                 1. IF HEAP[TOP] = HEAP[TOP] - 1
         """
-        file.write("NEGA")
+        self.file.write("NEGA\n")
         pass
     
     # Comparisson operations
-    @staticmethod
-    def lt(file: TextIOWrapper):
+    def lt(self):
         """
             Write CMME.
             Do:
@@ -126,11 +125,10 @@ class MepaWriter:
                 1. IF HEAP[TOP - 1] < HEAP[TOP] THEN HEAP[TOP - 1] = 1 ELSE HEAP[TOP - 1] = 0
                 2. TOP = TOP - 1
         """
-        file.write("CMME")
+        self.file.write("CMME\n")
         pass
 
-    @staticmethod
-    def gt(file: TextIOWrapper):
+    def gt(self):
         """
             Write CMMA.
             Do:
@@ -138,11 +136,10 @@ class MepaWriter:
                 1. IF HEAP[TOP - 1] > HEAP[TOP] THEN HEAP[TOP - 1] = 1 ELSE HEAP[TOP - 1] = 0
                 2. TOP = TOP - 1
         """
-        file.write("CMMA")
+        self.file.write("CMMA\n")
         pass
 
-    @staticmethod
-    def eq(file: TextIOWrapper):
+    def eq(self):
         """
             Write CMIG.
             Do:
@@ -150,11 +147,10 @@ class MepaWriter:
                 1. IF HEAP[TOP - 1] = HEAP[TOP] THEN HEAP[TOP - 1] = 1 ELSE HEAP[TOP - 1] = 0
                 2. TOP = TOP - 1
         """
-        file.write("CMIG")
+        self.file.write("CMIG\n")
         pass
 
-    @staticmethod
-    def neq(file: TextIOWrapper):
+    def neq(self):
         """
             Write CMDG.
             Do:
@@ -162,11 +158,10 @@ class MepaWriter:
                 1. IF HEAP[TOP - 1] <> HEAP[TOP] THEN HEAP[TOP - 1] = 1 ELSE HEAP[TOP - 1] = 0
                 2. TOP = TOP - 1
         """
-        file.write("CMDG")
+        self.file.write("CMDG\n")
         pass
 
-    @staticmethod
-    def leq(file: TextIOWrapper):
+    def leq(self):
         """
             Write CMNI.
             Do:
@@ -174,11 +169,10 @@ class MepaWriter:
                 1. IF HEAP[TOP - 1] <= HEAP[TOP] THEN HEAP[TOP - 1] = 1 ELSE HEAP[TOP - 1] = 0
                 2. TOP = TOP - 1
         """
-        file.write("CMNI")
+        self.file.write("CMNI\n")
         pass
 
-    @staticmethod
-    def gte(file: TextIOWrapper):
+    def gte(self):
         """
             Write CMYI.
             Do:
@@ -186,35 +180,21 @@ class MepaWriter:
                 1. IF HEAP[TOP - 1] >= HEAP[TOP] THEN HEAP[TOP - 1] = 1 ELSE HEAP[TOP - 1] = 0
                 2. TOP = TOP - 1
         """
-        file.write("CMYI")
+        self.file.write("CMYI\n")
         pass
 
     # Jump instructions
-    @staticmethod
-    def jump(file: TextIOWrapper, label:str ):
+    def jmp(self, label:str ):
         """
             Write DSVS label.
             Do:
                 
                 1. i = LABEL_HASHMAP[label]
         """
-        file.write(f"APCT {label}")
-        pass
-
-    # Jump instructions
-    @staticmethod
-    def jmp(file: TextIOWrapper, label:str ):
-        """
-            Write DSVS label.
-            Do:
-                
-                1. i = LABEL_HASHMAP[label]
-        """
-        file.write(f"DSVS {label}")
+        self.file.write(f"DSVS {label}\n")
         pass
     
-    @staticmethod
-    def jz(file: TextIOWrapper, label:str ):
+    def jz(self, label:str ):
         """
             Write DSVF label.
             Do:
@@ -222,33 +202,30 @@ class MepaWriter:
                 1. IF HEAP[TOP] = 0 THEN i = LABEL_HASHMAP[label] ELSE i = i + 1
                 2. TOP = TOP - 1
         """
-        file.write(f"DSVF {label}")
+        self.file.write(f"DSVF {label}\n")
         pass
 
-    @staticmethod
-    def nop(file: TextIOWrapper, label:str ):
+    def nop(self, label:str ):
         """
             Write label NADA.
             Do:
                 1. LABEL_HASHMAP[label] = i - 1 
         """
-        file.write(f"{label} NADA")
+        self.file.write(f"{label} NADA\n")
         pass
     
     # Read/write instruction
-    @staticmethod
-    def read(file: TextIOWrapper):
+    def read(self):
         """
             Write LEER.
             Do:
                 1. TOP = TOP + 1
                 2. HEAP[TOP] = input sent by stream
         """
-        file.write(f"LEER")
+        self.file.write(f"LEER\n")
         pass
 
-    @staticmethod
-    def write(file: TextIOWrapper):
+    def write(self):
         """
             Write IMPR
             Do:
@@ -256,12 +233,11 @@ class MepaWriter:
                 1. print HEAP[TOP]
                 2. TOP = TOP - 1
         """
-        file.write(f"IMPR")
+        self.file.write(f"IMPR\n")
         pass
 
     # Push instructions
-    @staticmethod
-    def push_c(file: TextIOWrapper, constant_value:str ):
+    def push_c(self, constant_value:str ):
         """
             Write APCT constant_value.
             Do:
@@ -269,11 +245,10 @@ class MepaWriter:
                 1. TOP = TOP + 1
                 1. HEAP[TOP] = constant_value
         """
-        file.write(f"APCT {constant_value}")
+        self.file.write(f"APCT {constant_value}\n")
         pass
     
-    @staticmethod
-    def push_v(file: TextIOWrapper, scope_level: int ,variable_offset: int ):
+    def push_v(self, scope_level: int ,variable_offset: int ):
         """
             Write APVL scope_level, variable_offset.
             Do:
@@ -281,12 +256,11 @@ class MepaWriter:
                 1. TOP = TOP + 1
                 2. HEAP[TOP] = HEAP[DISPLAY[scope_level] + variable_offset ]
         """
-        file.write(f"APVL {scope_level}, {variable_offset}")
+        self.file.write(f"APVL {scope_level}, {variable_offset}\n")
         pass
     
     # Store
-    @staticmethod
-    def store(file: TextIOWrapper, scope_level: int ,variable_offset: int ):
+    def store(self, scope_level: int ,variable_offset: int ):
         """
             Write ALVL scope_level, variable_offset.
             Do:
@@ -294,12 +268,11 @@ class MepaWriter:
                 1. HEAP[DISPLAY[scope_level] + variable_offset ] = HEAP[TOP]
                 2. TOP = TOP - 1
         """
-        file.write(f"ALVL {scope_level}, {variable_offset}")
+        self.file.write(f"ALVL {scope_level}, {variable_offset}\n")
         pass
     
     # Programs and procedures
-    @staticmethod
-    def init(file: TextIOWrapper):
+    def init(self):
         """
             Write INPP.
             Do:
@@ -307,11 +280,10 @@ class MepaWriter:
                 1. TOP = - 1
                 2. DISPLAY[0] = 0
         """
-        file.write("INPP")
+        self.file.write("INPP\n")
         pass
     
-    @staticmethod
-    def enter(file: TextIOWrapper, procedure_level: int):
+    def enter(self, procedure_level: int):
         """
             Write ENPR procedure_level.
             Do:
@@ -320,11 +292,10 @@ class MepaWriter:
                 2. HEAP[TOP] = DISPLAY[procedure_level]
                 3. DISPLAY[procedure_level] = TOP + 1
         """
-        file.write(f"ENPR {procedure_level}")
+        self.file.write(f"ENPR {procedure_level}\n")
         pass
     
-    @staticmethod
-    def call(file: TextIOWrapper, procedure_label: int):
+    def call(self, procedure_label: int):
         """
             Write LLPR procedure_level.
             Do:
@@ -333,11 +304,10 @@ class MepaWriter:
                 2. HEAP[TOP] = i + 1
                 3. i = LABEL_HASHMAP[procedure_label]
         """
-        file.write(f"LLPR {procedure_label}")
+        self.file.write(f"LLPR {procedure_label}\n")
         pass
     
-    @staticmethod
-    def memloc(file: TextIOWrapper, memory_to_alloc: int):
+    def malloc(self, memory_to_alloc: int):
         """
             Write RMEM memory_to_alloc.
             Do:
@@ -345,22 +315,20 @@ class MepaWriter:
                 1. TOP = TOP + memory_to_alloc
                 
         """
-        file.write(f"RMEM {memory_to_alloc}")
+        self.file.write(f"RMEM {memory_to_alloc}\n")
         pass
     
-    @staticmethod
-    def free(file: TextIOWrapper, memory_to_free: int):
+    def free(self, memory_to_free: int):
         """
             Write LMEM memory_to_free.
             Do:
                 
                 1. TOP = TOP - memory_to_free
         """
-        file.write(f"LMEM {memory_to_free}")
+        self.file.write(f"LMEM {memory_to_free}\n")
         pass
     
-    @staticmethod
-    def _return(file: TextIOWrapper, procedure_level: int, memory_required_by_parameters: int):
+    def _return(self, procedure_level: int, memory_required_by_parameters: int):
         """
             Write RTPR procedure_level, memory_required_by_parameters.
             Do:
@@ -369,15 +337,14 @@ class MepaWriter:
                 2. i = HEAP[TOP - 1]
                 1. TOP = TOP - (memory_required_by_parameters + 2)
         """
-        file.write(f"RTPR {procedure_level}, {memory_required_by_parameters}")
+        self.file.write(f"RTPR {procedure_level}, {memory_required_by_parameters}\n")
         pass
     
-    @staticmethod
-    def halt(file: TextIOWrapper):
+    def halt(self):
         """
             Write PARA.
         """
-        file.write("PARA")
+        self.file.write("PARA\n")
         pass
 
     pass

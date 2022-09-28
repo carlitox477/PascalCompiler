@@ -5,7 +5,7 @@ from .semantic_analizer.semantic_exception import SemanticException
 from .semantic_error_analizer import SemanticErrorAnalyzer
 
 from .semantic_analizer.symbol_table import SymbolTable
-from .utils import check_token, match_token, isTokenInList
+from .utils import check_token, match_token
 from .syntax_exception import SyntaxException
 
 
@@ -188,6 +188,7 @@ class ExpresionRulesRecognizer:
         while(success_valid_tk_arith_op or success_tk_or):
             if(success_valid_tk_arith_op):
                 pending_source_code,current_column, current_row,operation_token,_=match_token('TK_arithOp',pending_source_code,current_column, current_row,{"operation":['ADD', 'SUB']})
+                print(pending_source_code)
                 SemanticErrorAnalyzer.check_correct_math_operation(first_term_datatype,operation_token)
             else:
                 pending_source_code,current_column, current_row,operation_token,_=match_token('TK_or',pending_source_code,current_column, current_row)

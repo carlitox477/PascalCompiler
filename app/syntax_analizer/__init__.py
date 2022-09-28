@@ -7,3 +7,4 @@ from syntax_analizer.syntax_exception import SyntaxException
 from .lexical_analizer.automatas.token import Token
 from .semantic_analizer.semantic_exception import SemanticException
 from .semantic_error_analizer import SemanticErrorAnalyzer
+from .mepa_writer import MepaWriter
