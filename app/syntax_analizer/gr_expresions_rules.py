@@ -48,7 +48,7 @@ class ExpresionRulesRecognizer:
     @staticmethod
     def verify_write_command_rule(pending_source_code:str,current_column:int, current_row:int, symbol_table: SymbolTable) -> Tuple[str,int,int]:
         """
-        Identifies rule: <comando_salida> ::= write(<expresion_simple>)
+        Identifies rule: <comando_salida> ::= write(<lista_de_expresiones>)
             
             Args:
                 pending_source_code(str): Pending code to analize. Acts as look ahead
@@ -63,7 +63,7 @@ class ExpresionRulesRecognizer:
         pending_source_code,current_column,current_row,_,_ = match_token('TK_write',pending_source_code,current_column,current_row)
         pending_source_code,current_column,current_row,_,_ = match_token('TK_parenthesis',pending_source_code,current_column,current_row,{"type": ['OPPAR']})
 
-        pending_source_code,current_column,current_row,_=ExpresionRulesRecognizer.verify_simple_expresion_rule(pending_source_code,current_column,current_row,symbol_table)
+        pending_source_code,current_column,current_row,_=ExpresionRulesRecognizer.verify_expresion_list_rule(pending_source_code,current_column,current_row,symbol_table)
         
         pending_source_code,current_column,current_row,_,_ = match_token('TK_parenthesis',pending_source_code,current_column,current_row,{"type": ['CLPAR']})
         return pending_source_code,current_column,current_row
@@ -188,7 +188,7 @@ class ExpresionRulesRecognizer:
         while(success_valid_tk_arith_op or success_tk_or):
             if(success_valid_tk_arith_op):
                 pending_source_code,current_column, current_row,operation_token,_=match_token('TK_arithOp',pending_source_code,current_column, current_row,{"operation":['ADD', 'SUB']})
-                print(pending_source_code)
+                
                 SemanticErrorAnalyzer.check_correct_math_operation(first_term_datatype,operation_token)
             else:
                 pending_source_code,current_column, current_row,operation_token,_=match_token('TK_or',pending_source_code,current_column, current_row)
@@ -198,12 +198,16 @@ class ExpresionRulesRecognizer:
             from_row=current_row
             from_col=current_column
             pending_source_code,current_column, current_row, term_datatype=ExpresionRulesRecognizer.verify_term_rule(pending_source_code,current_column, current_row,symbol_table)
+            #print(pending_source_code)
             if(term_datatype != first_term_datatype):
                 raise SemanticException(f"SEMANTIC ERROR: Expected term type {first_term_datatype}, but it is {term_datatype} in (r:{from_row},c:{from_col})-(r:{current_row},c:{current_column})")
-
+            #print(pending_source_code)
             success_valid_tk_arith_op=check_token('TK_arithOp',pending_source_code,current_column, current_row,{"operation":['ADD', 'SUB']})
             success_tk_or=check_token('TK_or',pending_source_code,current_column, current_row)
+            
             pass
+        #print("-------------------")
+        #print(pending_source_code)
         return pending_source_code,current_column, current_row, first_term_datatype
 
     @staticmethod

@@ -99,7 +99,9 @@ class CommandRulesRecognizer:
         """
         pending_source_code,current_column, current_row,_,_ = match_token('TK_if',pending_source_code,current_column, current_row)
         pending_source_code,current_column, current_row,_ = ExpresionRulesRecognizer.verify_expresion_rule(pending_source_code,current_column, current_row,symbol_table,"BOOLEAN")
+        
         pending_source_code,current_column, current_row,_,_ = match_token('TK_then',pending_source_code,current_column, current_row)
+        
         pending_source_code,current_column, current_row = CommandRulesRecognizer.verify_command(pending_source_code,current_column, current_row,symbol_table,mepa_writer)
         
         success_tk_else = True

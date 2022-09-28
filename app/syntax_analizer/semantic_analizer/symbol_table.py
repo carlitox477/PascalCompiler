@@ -86,7 +86,6 @@ class SymbolTable:
         self_symbol_copy=self_symbol.copy()
         self_symbol_copy.offset=-2
         self.scope_content[self_symbol_copy.get_signature()]=self_symbol_copy
-        # self.offset=self.offset+1
         self.paramters_types=self_symbol.parameter_list.copy()
         pass
 

@@ -1,7 +1,5 @@
 INPP
 RMEM 1
-DSVS l0_java()[0]
-l1_func(INTEGER, INTEGER)[1] ENPR 1
+DSVS l0_ejemplo()[0]
+l1_p(INTEGER, INTEGER)[1] ENPR 1
 RMEM 1
-l0_java()[0] NADA
-PARA

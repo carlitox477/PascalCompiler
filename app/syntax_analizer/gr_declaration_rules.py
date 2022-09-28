@@ -272,8 +272,8 @@ class DeclarationRulesRecognizer:
         pending_source_code,current_column, current_row,_,_=match_token('TK_semicolon',pending_source_code,current_column, current_row)
         pending_source_code,current_column, current_row=DeclarationRulesRecognizer.verify_block_rule(pending_source_code,current_column, current_row, procedure_symbol_table,mepa_writer)
         
-        print("---------------------")
-        print(procedure_symbol_table.to_string())
+        #print("---------------------")
+        #print(procedure_symbol_table.to_string())
         return pending_source_code,current_column, current_row
 
     @staticmethod
@@ -329,8 +329,8 @@ class DeclarationRulesRecognizer:
         
         function_symbol_table.add_recursion_call(function_symbol)
         function_symbol_table.add_return_slot(Symbol("VAR",identifier_token.getAttribute("name"),[],function_symbol.output_type,-1,function_symbol.line))
-        print("---------------------")
-        print(function_symbol_table.to_string())
+        #print("---------------------")
+        #print(function_symbol_table.to_string())
         #print("---------------------")
         #print(symbol_table.to_string())
 
