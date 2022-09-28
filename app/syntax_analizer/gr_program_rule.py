@@ -25,9 +25,9 @@ class ProgramRuleRecognizer:
 
         # we delete comments, whitespaces and tabs
         delete_whitespaces_and_comments(pending_source_code, current_column, current_row)
-        # print("Programa sin errores sintacticos.")
-        # print("--------------------------------")
-        # print(program_table.to_string())
+        #print("Programa sin errores sintacticos.")
+        print("--------------------------------")
+        print(program_table.to_string())
         mepa_writer.close_file()
         
         return True

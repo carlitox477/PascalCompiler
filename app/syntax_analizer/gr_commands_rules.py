@@ -59,9 +59,11 @@ class CommandRulesRecognizer:
                 current_row(int): Row where the updated look ahead is
         """
         if check_token('TK_begin',pending_source_code,current_column, current_row):
+            #print(pending_source_code)
             return CommandRulesRecognizer.verify_compound_command_rule(pending_source_code,current_column, current_row,symbol_table, mepa_writer)
 
         if check_token('TK_if',pending_source_code,current_column, current_row):
+            #print("IFFFFFFFFFFF")
             return CommandRulesRecognizer.verify_conditional_command_rule(pending_source_code,current_column, current_row,symbol_table, mepa_writer)
 
         if check_token('TK_identifier',pending_source_code,current_column, current_row):
@@ -157,7 +159,7 @@ class CommandRulesRecognizer:
             expected_datatype = symbol_table.getSymbol(identifier_signature).output_type
             # print(symbol_table.getSymbol(identifier_signature).to_string())
             pending_source_code,current_column,current_row=CommandRulesRecognizer.verify_rest_of_assignation_rule(pending_source_code,current_column,current_row,symbol_table, expected_datatype)
-            print(symbol_table.to_string())
+            #print(symbol_table.to_string())
         elif success_open_par:
             # IMPORTANT: By design decision, only procedure are callable here
             # Verify if there is at least one procedure with the identifier name

@@ -84,9 +84,9 @@ class SymbolTable:
     def add_recursion_call(self, self_symbol:Symbol):
         # Allows to add access to the function or procedure itself to allow recursion
         self_symbol_copy=self_symbol.copy()
-        self_symbol.offset=self.offset
-        self.scope_content[self_symbol_copy.get_signature()]=self_symbol
-        self.offset=self.offset+1
+        self_symbol_copy.offset=-2
+        self.scope_content[self_symbol_copy.get_signature()]=self_symbol_copy
+        # self.offset=self.offset+1
         self.paramters_types=self_symbol.parameter_list.copy()
         pass
 
@@ -186,6 +186,11 @@ class SymbolTable:
             parent_table=parent_table.parent_symbol_table
             pass
         return response
+
+    def add_return_slot(self,return_symbol: Symbol):
+        return_symbol.offset=-1
+        self.scope_content[return_symbol.get_signature()]=return_symbol
+        pass
     
     def get_label(self):
         return f"l{self.label_number}_{self.scope_name}({self.get_parameter_list_str()})[{self.scope_level}]"

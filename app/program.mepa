@@ -1,9 +1,7 @@
 INPP
-RMEM 2
-RMEM 2
-DSVS l0_prueba()[0]
-l1_algo(BOOLEAN, BOOLEAN)[1] ENPR 1
 RMEM 1
-l2_nuevo(INTEGER, INTEGER)[1] ENPR 1
-l0_prueba()[0] NADA
+DSVS l0_java()[0]
+l1_func(INTEGER, INTEGER)[1] ENPR 1
+RMEM 1
+l0_java()[0] NADA
 PARA

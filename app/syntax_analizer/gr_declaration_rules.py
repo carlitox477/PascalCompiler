@@ -1,5 +1,6 @@
 
 from typing import Tuple
+from xmlrpc.client import boolean
 from .mepa_writer import MepaWriter
 
 from syntax_analizer.semantic_analizer.symbol import Symbol
@@ -82,7 +83,7 @@ class DeclarationRulesRecognizer:
         return pending_source_code,current_column, current_row
     
     @staticmethod
-    def verify_variables_declaration_rule(pending_source_code:str,current_column:int, current_row:int,symbol_table: SymbolTable,mepa_writer: MepaWriter, reserve_memory = True) -> Tuple[str,int,int,list]:
+    def verify_variables_declaration_rule(pending_source_code:str,current_column:int, current_row:int,symbol_table: SymbolTable,mepa_writer: MepaWriter, reserve_memory: bool) -> Tuple[str,int,int,list]:
         """
             Identifies rule: <declaracion_de_variables> ::= <lista_de_identificadores> : <tipo_de_dato>
             
@@ -271,8 +272,8 @@ class DeclarationRulesRecognizer:
         pending_source_code,current_column, current_row,_,_=match_token('TK_semicolon',pending_source_code,current_column, current_row)
         pending_source_code,current_column, current_row=DeclarationRulesRecognizer.verify_block_rule(pending_source_code,current_column, current_row, procedure_symbol_table,mepa_writer)
         
-        #print("---------------------")
-        #print(procedure_symbol_table.to_string())
+        print("---------------------")
+        print(procedure_symbol_table.to_string())
         return pending_source_code,current_column, current_row
 
     @staticmethod
@@ -318,15 +319,18 @@ class DeclarationRulesRecognizer:
         function_symbol=Symbol("FUNCTION", identifier_token.getAttribute("name"),[],None,0,identifier_token.row)
         function_symbol.add_parameters(parameters_symbols)
         function_symbol.output_type=datatype_token.getAttribute("name")
+        #print("PROGRAM DUNCTION ADDITION")
+        #print(function_symbol.to_string())
         symbol_table.addSymbol(function_symbol)
         
 
         # Add function name as var
         #print(function_symbol_table.to_string())
-        function_symbol_table.addSymbol(Symbol("VAR",identifier_token.getAttribute("name"),[],function_symbol.output_type,0,function_symbol.line))
+        
         function_symbol_table.add_recursion_call(function_symbol)
-        #print("---------------------")
-        #print(function_symbol_table.to_string())
+        function_symbol_table.add_return_slot(Symbol("VAR",identifier_token.getAttribute("name"),[],function_symbol.output_type,-1,function_symbol.line))
+        print("---------------------")
+        print(function_symbol_table.to_string())
         #print("---------------------")
         #print(symbol_table.to_string())
 
@@ -359,14 +363,14 @@ class DeclarationRulesRecognizer:
                 continue_analysis = False
 
             if continue_analysis:
-                pending_source_code,current_column,current_row,more_variable_symbol_list=DeclarationRulesRecognizer.verify_variables_declaration_section_rule(pending_source_code,current_column,current_row,symbol_table, False)
+                pending_source_code,current_column,current_row,more_variable_symbol_list=DeclarationRulesRecognizer.verify_variables_declaration_section_rule(pending_source_code,current_column,current_row,symbol_table, mepa_writer,False)
                 variable_symbol_list.extend(more_variable_symbol_list)
                 pass        
             pass
         return pending_source_code,current_column,current_row,variable_symbol_list
 
     @staticmethod
-    def verify_variables_declaration_section_rule(pending_source_code:str,current_column:int,current_row:int,symbol_table: SymbolTable, mepa_writer: MepaWriter, reserve_memory = True) -> Tuple[str,int,int,list]:
+    def verify_variables_declaration_section_rule(pending_source_code:str,current_column:int,current_row:int,symbol_table: SymbolTable, mepa_writer: MepaWriter, reserve_memory: bool) -> Tuple[str,int,int,list]:
         """
             Identifies rule: <seccion_declaracion_de_variables> ::= [ var ] <declaracion_de_variables>
             

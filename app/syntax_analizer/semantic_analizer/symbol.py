@@ -66,8 +66,11 @@ class Symbol:
         return f"{ summary }; {self.get_parameters_summary()}"
 
     def add_parameters(self,parameters:list):
+        index = 0
         for symbol in parameters:
+            symbol.offset= -(2+(len(parameters)-index))
             self.parameter_list.append(symbol.output_type)
+            index = index + 1
         pass
 
     def equal(self,symbol):
