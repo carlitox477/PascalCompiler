@@ -3,3 +3,5 @@ RMEM 1
 DSVS l0_ejemplo()[0]
 l1_p(INTEGER, INTEGER)[1] ENPR 1
 RMEM 1
+l0_ejemplo()[0] NADA
+PARA

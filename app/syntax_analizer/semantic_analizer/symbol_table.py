@@ -80,6 +80,14 @@ class SymbolTable:
         self.scope_content[symbol_to_add.get_signature()]=symbol_to_add
         self.offset=self.offset+1
         pass
+    
+    def add_parameters(self,parameters:list):
+        index = 0
+        for symbol in parameters:
+            symbol.offset= -(2+(len(parameters)-index))
+            index = index + 1
+            self.scope_content[symbol.get_signature()]=symbol
+        pass
 
     def add_recursion_call(self, self_symbol:Symbol):
         # Allows to add access to the function or procedure itself to allow recursion
@@ -189,6 +197,7 @@ class SymbolTable:
     def add_return_slot(self,return_symbol: Symbol):
         return_symbol.offset=-1
         self.scope_content[return_symbol.get_signature()]=return_symbol
+        print(f"AFTER ADDING RETURN SLOT: {self.get_label()} OFFSET: {self.offset}")
         pass
     
     def get_label(self):

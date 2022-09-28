@@ -104,17 +104,22 @@ class DeclarationRulesRecognizer:
         pending_source_code,current_column, current_row,_,_=match_token('TK_colon',pending_source_code,current_column, current_row)
         pending_source_code,current_column, current_row,datatype_token=DeclarationRulesRecognizer.verify_datatype_rule(pending_source_code,current_column, current_row)
 
+        
+        symbols_to_add=create_symbol_list_from_identifier_list(identifier_token_list,datatype_token)
         # SEMANTIC
         # Add identifier list to table
-        symbols_to_add=create_symbol_list_from_identifier_list(identifier_token_list,datatype_token)
         
-        symbol_table.addSymbolList(symbols_to_add)
-        
-        # MEPA
-        # We reserve memory for later variables asignation
         if(reserve_memory):
+            # SEMANTIC
+            # Add local symbols to table
+            symbol_table.addSymbolList(symbols_to_add)
+
+            # MEPA
+            # We reserve memory for later variables asignation
             mepa_writer.malloc(len(symbols_to_add))
             mepa_writer.top_write_pointer= mepa_writer.top_write_pointer + len(symbols_to_add)
+
+        pass
 
 
         return pending_source_code,current_column, current_row,symbols_to_add
@@ -262,18 +267,22 @@ class DeclarationRulesRecognizer:
         if(success):
             pending_source_code,current_column, current_row,parameters_symbols=DeclarationRulesRecognizer.verify_formal_parameters_rule(pending_source_code,current_column, current_row,procedure_symbol_table,mepa_writer)
             pending_source_code,current_column, current_row,_,_=match_token('TK_parenthesis',pending_source_code,current_column, current_row,{"type": ['CLPAR']})
+            
             procedure_symbol.add_parameters(parameters_symbols)
             pass
 
         
         symbol_table.addSymbol(procedure_symbol)
+        procedure_symbol_table.add_parameters(parameters_symbols)
         procedure_symbol_table.add_recursion_call(procedure_symbol)
 
         pending_source_code,current_column, current_row,_,_=match_token('TK_semicolon',pending_source_code,current_column, current_row)
+        
+        
         pending_source_code,current_column, current_row=DeclarationRulesRecognizer.verify_block_rule(pending_source_code,current_column, current_row, procedure_symbol_table,mepa_writer)
         
-        #print("---------------------")
-        #print(procedure_symbol_table.to_string())
+        print("---------------------")
+        print(procedure_symbol_table.to_string())
         return pending_source_code,current_column, current_row
 
     @staticmethod
@@ -319,24 +328,24 @@ class DeclarationRulesRecognizer:
         function_symbol=Symbol("FUNCTION", identifier_token.getAttribute("name"),[],None,0,identifier_token.row)
         function_symbol.add_parameters(parameters_symbols)
         function_symbol.output_type=datatype_token.getAttribute("name")
-        #print("PROGRAM DUNCTION ADDITION")
         #print(function_symbol.to_string())
+        
         symbol_table.addSymbol(function_symbol)
         
 
         # Add function name as var
-        #print(function_symbol_table.to_string())
         
+        function_symbol_table.add_parameters(parameters_symbols)
         function_symbol_table.add_recursion_call(function_symbol)
         function_symbol_table.add_return_slot(Symbol("VAR",identifier_token.getAttribute("name"),[],function_symbol.output_type,-1,function_symbol.line))
-        #print("---------------------")
-        #print(function_symbol_table.to_string())
-        #print("---------------------")
-        #print(symbol_table.to_string())
+        
 
         pending_source_code,current_column, current_row,_,_=match_token('TK_semicolon',pending_source_code,current_column, current_row)
         
         pending_source_code,current_column, current_row=DeclarationRulesRecognizer.verify_block_rule(pending_source_code,current_column, current_row, function_symbol_table, mepa_writer)
+        
+        print("---------------------")
+        print(function_symbol_table.to_string())
         return pending_source_code,current_column, current_row
 
     @staticmethod

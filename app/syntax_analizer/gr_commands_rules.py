@@ -69,16 +69,16 @@ class CommandRulesRecognizer:
         if check_token('TK_identifier',pending_source_code,current_column, current_row):
             pending_source_code,current_column, current_row,identifier_token,_=match_token('TK_identifier',pending_source_code,current_column, current_row)            
             # We send identifier token as param, in case it is an assignation command it will help to semantic analizer, if not it will help to check if function is in symbol table
-            return CommandRulesRecognizer.verify_command_2_rule(pending_source_code,current_column, current_row,symbol_table,identifier_token)
+            return CommandRulesRecognizer.verify_command_2_rule(pending_source_code,current_column, current_row,symbol_table,identifier_token,mepa_writer)
         
         if check_token('TK_while',pending_source_code,current_column, current_row):
             return CommandRulesRecognizer.verify_repetitive_command_rule(pending_source_code,current_column, current_row,symbol_table, mepa_writer)
         
         if check_token('TK_read',pending_source_code,current_column, current_row):
-            return ExpresionRulesRecognizer.verify_lecture_command_rule(pending_source_code,current_column,current_row, symbol_table)
+            return ExpresionRulesRecognizer.verify_lecture_command_rule(pending_source_code,current_column,current_row, symbol_table,mepa_writer)
         
         if check_token('TK_write',pending_source_code,current_column, current_row):
-            return ExpresionRulesRecognizer.verify_write_command_rule(pending_source_code,current_column,current_row,symbol_table)
+            return ExpresionRulesRecognizer.verify_write_command_rule(pending_source_code,current_column,current_row,symbol_table,mepa_writer)
         
         raise Exception(f"SYNTAX ERROR: Expected to find a token in {['TK_begin', 'TK_if', 'TK_identifier', 'TK_while', 'TK_read', 'TK_write']}, but found other in row {current_row}, column {current_column}: {pending_source_code[0:20]}")
 
@@ -105,7 +105,9 @@ class CommandRulesRecognizer:
         pending_source_code,current_column, current_row = CommandRulesRecognizer.verify_command(pending_source_code,current_column, current_row,symbol_table,mepa_writer)
         
         success_tk_else = True
+
         try:
+            
             pending_source_code,current_column, current_row,_,_=match_token('TK_else',pending_source_code,current_column, current_row)
         except SyntaxException:
             success_tk_else= False
@@ -136,7 +138,7 @@ class CommandRulesRecognizer:
         return pending_source_code,current_column,current_row
 
     @staticmethod
-    def verify_command_2_rule(pending_source_code:str,current_column:int, current_row:int,symbol_table: SymbolTable, identifier_token: Token) -> Tuple[str,int,int]:
+    def verify_command_2_rule(pending_source_code:str,current_column:int, current_row:int,symbol_table: SymbolTable, identifier_token: Token, mepa_writer: MepaWriter) -> Tuple[str,int,int]:
         """
         Identifies rule: <comando'> ::= <resto_asignacion> | <resto_llamada_funcion>
             
@@ -168,7 +170,7 @@ class CommandRulesRecognizer:
             SemanticErrorAnalyzer.check_exists_any_accesible_procedure_with_name(identifier_token,symbol_table)
             # Get expresion datatypes to see if there is a function with the correct signature, otherwise raise error
             
-            pending_source_code,current_column, current_row,parameters_datatypes= ExpresionRulesRecognizer.verify_rest_of_function_call_rule(pending_source_code,current_column,current_row,symbol_table,identifier_token,True)
+            pending_source_code,current_column, current_row,parameters_datatypes= ExpresionRulesRecognizer.verify_rest_of_function_call_rule(pending_source_code,current_column,current_row,symbol_table,identifier_token,mepa_writer,True)
             
 
             # check if procedure is callable
