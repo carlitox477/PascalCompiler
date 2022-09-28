@@ -97,5 +97,9 @@ class Symbol:
             pass
         return True
 
+    def copy(self):
+        return Symbol(self.symbol_type,self.symbol_name,self.parameter_list,self.output_type,self.offset,self.line)
+        pass
+
 
     pass

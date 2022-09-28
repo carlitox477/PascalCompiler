@@ -246,6 +246,7 @@ class DeclarationRulesRecognizer:
 
         
         symbol_table.addSymbol(procedure_symbol)
+        procedure_symbol_table.add_recursion_call(procedure_symbol)
 
         pending_source_code,current_column, current_row,_,_=match_token('TK_semicolon',pending_source_code,current_column, current_row)
         pending_source_code,current_column, current_row=DeclarationRulesRecognizer.verify_block_rule(pending_source_code,current_column, current_row, procedure_symbol_table)
@@ -297,12 +298,13 @@ class DeclarationRulesRecognizer:
         function_symbol=Symbol("FUNCTION", identifier_token.getAttribute("name"),[],None,0,identifier_token.row)
         function_symbol.add_parameters(parameters_symbols)
         function_symbol.output_type=datatype_token.getAttribute("name")
-        
         symbol_table.addSymbol(function_symbol)
+        
+
         # Add function name as var
         #print(function_symbol_table.to_string())
         function_symbol_table.addSymbol(Symbol("VAR",identifier_token.getAttribute("name"),[],function_symbol.output_type,0,function_symbol.line))
-        
+        function_symbol_table.add_recursion_call(function_symbol)
         #print("---------------------")
         #print(function_symbol_table.to_string())
         #print("---------------------")

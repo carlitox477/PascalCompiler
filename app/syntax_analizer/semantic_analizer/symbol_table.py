@@ -32,6 +32,7 @@ class SymbolTable:
         self.scope_content=scope_content
         self.offset=offset
         self.line=line
+        #self.output_type= None
         #if scope_type=="FUNCTION":
         #    self.scope_content[scope_name]=Symbol("VAR",scope_name,[],output_type,offset,line)
         #    self.offset=1
@@ -65,12 +66,20 @@ class SymbolTable:
         self.offset=self.offset+1
         pass
 
+    def add_recursion_call(self, self_symbol:Symbol):
+        # Allows to add access to the function or procedure itself to allow recursion
+        self_symbol_copy=self_symbol.copy()
+        self_symbol.offset=self.offset
+        self.scope_content[self_symbol_copy.get_signature()]=self_symbol
+        self.offset=self.offset+1
+        pass
+
     def isInLocalTable(self, symbol_to_add: Symbol)->bool:
         if symbol_to_add.symbol_name == self.scope_name:
             if(self.scope_type == "PROGRAM"):
                 return True
             elif(self.scope_content.get(self.scope_name,None)!= None):
-                # Every time a function is declered we should add in local table
+                # Every time a function is declered we should allow to add it in local table
                 return True
             else:
                 return False

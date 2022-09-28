@@ -1,4 +1,4 @@
-from app.lexical_analizer import PASCAL_PROGRAM_PATH
+# from app.lexical_analizer import PASCAL_PROGRAM_PATH
 
 
 WHITE_SPACE_RECOGNIZER_TEST_CASES=[

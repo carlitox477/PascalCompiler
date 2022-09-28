@@ -2,6 +2,9 @@
 .pytest_cache
 tests/__pycache__
 app/__pycache__
-app/lexical_analizer/__pycache__
-app/lexical_analizer/automatas/__pycache__
+app/syntax_analizer/__pycache__
+app/syntax_analizer/lexical_analizer/__pycache__
+app/syntax_analizer/lexical_analizer/automatas/__pycache__
+app/semantic_analizer/__pycache__
 .env
+app/pascal-programs
