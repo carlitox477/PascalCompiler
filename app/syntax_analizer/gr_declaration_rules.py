@@ -34,7 +34,7 @@ class DeclarationRulesRecognizer:
 
 
 
-        pending_source_code,current_column, current_row=DeclarationRulesRecognizer.verify_variables_declaration_part_rule(pending_source_code,current_column, current_row,symbol_table)
+        pending_source_code,current_column, current_row,len_symbols_added=DeclarationRulesRecognizer.verify_variables_declaration_part_rule(pending_source_code,current_column, current_row,symbol_table)
         
         if(is_program):
             DeclarationRulesRecognizer.mepa_writer.jmp(symbol_table.get_label())
@@ -43,6 +43,13 @@ class DeclarationRulesRecognizer:
         if(is_program):
             DeclarationRulesRecognizer.mepa_writer.nop(symbol_table.get_label())
         pending_source_code,current_column, current_row=CommandRulesRecognizer.verify_compound_command_rule(pending_source_code,current_column, current_row,symbol_table)
+        
+        # Free memory
+        DeclarationRulesRecognizer.mepa_writer.free(len_symbols_added)
+        if(symbol_table.scope_type=="FUNCTION"):
+            # Add return instruction
+            DeclarationRulesRecognizer.mepa_writer._return(symbol_table.scope_level,len(symbol_table.paramters_types))
+
         return pending_source_code,current_column, current_row
     
     @staticmethod
@@ -65,23 +72,24 @@ class DeclarationRulesRecognizer:
         except SyntaxException:
             # # Assume non var declaration
             return pending_source_code,current_column, current_row
-
+        len_symbols_to_add=0
         # At least one line of variables declaration
-        pending_source_code,current_column, current_row,_=DeclarationRulesRecognizer.verify_variables_declaration_rule(pending_source_code,current_column, current_row,symbol_table,True)    
+        pending_source_code,current_column, current_row,symbols_to_add=DeclarationRulesRecognizer.verify_variables_declaration_rule(pending_source_code,current_column, current_row,symbol_table,True)    
         pending_source_code,current_column, current_row, _,_= match_token('TK_semicolon',pending_source_code,current_column, current_row)
-
+        len_symbols_to_add=len(symbols_to_add)
         success = True
         while success:
             if success:
                 try:
-                    pending_source_code,current_column, current_row, _ = DeclarationRulesRecognizer.verify_variables_declaration_rule(pending_source_code,current_column, current_row,symbol_table,True)
+                    pending_source_code,current_column, current_row, symbols_to_add = DeclarationRulesRecognizer.verify_variables_declaration_rule(pending_source_code,current_column, current_row,symbol_table,True)
+                    len_symbols_to_add=len_symbols_to_add+len(symbols_to_add)
                 except SyntaxException:
                     success = False
                 if success:
                     pending_source_code,current_column, current_row,_,_=match_token('TK_semicolon',pending_source_code,current_column, current_row)
                 pass
             pass
-        return pending_source_code,current_column, current_row
+        return pending_source_code,current_column, current_row,len_symbols_to_add
     
     @staticmethod
     def verify_variables_declaration_rule(pending_source_code:str,current_column:int, current_row:int,symbol_table: SymbolTable, reserve_memory: bool) -> Tuple[str,int,int,list]:

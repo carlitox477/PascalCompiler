@@ -7,7 +7,7 @@ from io import TextIOWrapper
 # LABEL_HASHMAP = Hashmap which allow us to look for an instruction based in a label name
 
 class MepaWriter:
-    
+    padding="\t\t"
     def __init__(self, file: TextIOWrapper) -> None:
         self.top_write_pointer=0
         self.file = file
@@ -26,7 +26,7 @@ class MepaWriter:
                 1. HEAP[TOP - 1] = HEAP[TOP - 1] + HEAP[TOP ]
                 2. TOP = TOP - 1
         """
-        self.file.write("ADD\n")
+        self.file.write(f"{MepaWriter.padding}ADD\n")
         pass
 
     def sub(self):
@@ -37,7 +37,7 @@ class MepaWriter:
                 1. HEAP[TOP - 1] = HEAP[TOP - 1] - HEAP[TOP ]
                 2. TOP = TOP - 1
         """
-        self.file.write("SUST\n")
+        self.file.write(f"{MepaWriter.padding}SUST\n")
         pass
 
     def mul(self):
@@ -48,7 +48,7 @@ class MepaWriter:
                 1. HEAP[TOP - 1] = HEAP[TOP - 1] * HEAP[TOP ]
                 2. TOP = TOP - 1
         """
-        self.file.write("MULT\n")
+        self.file.write(f"{MepaWriter.padding}MULT\n")
         pass
 
     def div(self):
@@ -59,7 +59,7 @@ class MepaWriter:
                 1. HEAP[TOP - 1] = HEAP[TOP - 1] / HEAP[TOP ]
                 2. TOP = TOP - 1
         """
-        self.file.write("DIVI\n")
+        self.file.write(f"{MepaWriter.padding}DIVI\n")
         pass
 
     def mod(self):
@@ -70,7 +70,7 @@ class MepaWriter:
                 1. HEAP[TOP - 1] = HEAP[TOP - 1] MOD HEAP[TOP ]
                 2. TOP = TOP - 1
         """
-        self.file.write("MODU\n")
+        self.file.write(f"{MepaWriter.padding}MODU\n")
         pass
 
     def uminus(self):
@@ -80,7 +80,7 @@ class MepaWriter:
 
                 1. HEAP[TOP] = -HEAP[TOP]
         """
-        self.file.write("UMEN\n")
+        self.file.write(f"{MepaWriter.padding}UMEN\n")
         pass
 
     # Logical operations
@@ -92,7 +92,7 @@ class MepaWriter:
                 1. IF HEAP[TOP - 1] = 1 AND HEAP[TOP] = 1 THEN HEAP[TOP - 1] = 1; ELSE HEAP[TOP - 1] = 0 
                 2. TOP = TOP - 1
         """
-        self.file.write("CONJ\n")
+        self.file.write(f"{MepaWriter.padding}CONJ\n")
         pass
 
     def _or(self):
@@ -103,7 +103,7 @@ class MepaWriter:
                 1. IF HEAP[TOP - 1] = 1 or HEAP[TOP] = 1 THEN HEAP[TOP - 1] = 1; ELSE HEAP[TOP - 1] = 0 
                 2. TOP = TOP - 1
         """
-        self.file.write("DISJ\n")
+        self.file.write(f"{MepaWriter.padding}DISJ\n")
         pass
 
     def _not(self):
@@ -113,7 +113,7 @@ class MepaWriter:
 
                 1. IF HEAP[TOP] = HEAP[TOP] - 1
         """
-        self.file.write("NEGA\n")
+        self.file.write(f"{MepaWriter.padding}NEGA\n")
         pass
     
     # Comparisson operations
@@ -125,7 +125,7 @@ class MepaWriter:
                 1. IF HEAP[TOP - 1] < HEAP[TOP] THEN HEAP[TOP - 1] = 1 ELSE HEAP[TOP - 1] = 0
                 2. TOP = TOP - 1
         """
-        self.file.write("CMME\n")
+        self.file.write(f"{MepaWriter.padding}CMME\n")
         pass
 
     def gt(self):
@@ -136,7 +136,7 @@ class MepaWriter:
                 1. IF HEAP[TOP - 1] > HEAP[TOP] THEN HEAP[TOP - 1] = 1 ELSE HEAP[TOP - 1] = 0
                 2. TOP = TOP - 1
         """
-        self.file.write("CMMA\n")
+        self.file.write(f"{MepaWriter.padding}CMMA\n")
         pass
 
     def eq(self):
@@ -147,7 +147,7 @@ class MepaWriter:
                 1. IF HEAP[TOP - 1] = HEAP[TOP] THEN HEAP[TOP - 1] = 1 ELSE HEAP[TOP - 1] = 0
                 2. TOP = TOP - 1
         """
-        self.file.write("CMIG\n")
+        self.file.write(f"{MepaWriter.padding}CMIG\n")
         pass
 
     def neq(self):
@@ -158,7 +158,7 @@ class MepaWriter:
                 1. IF HEAP[TOP - 1] <> HEAP[TOP] THEN HEAP[TOP - 1] = 1 ELSE HEAP[TOP - 1] = 0
                 2. TOP = TOP - 1
         """
-        self.file.write("CMDG\n")
+        self.file.write(f"{MepaWriter.padding}CMDG\n")
         pass
 
     def leq(self):
@@ -169,7 +169,7 @@ class MepaWriter:
                 1. IF HEAP[TOP - 1] <= HEAP[TOP] THEN HEAP[TOP - 1] = 1 ELSE HEAP[TOP - 1] = 0
                 2. TOP = TOP - 1
         """
-        self.file.write("CMNI\n")
+        self.file.write(f"{MepaWriter.padding}CMNI\n")
         pass
 
     def gte(self):
@@ -180,7 +180,7 @@ class MepaWriter:
                 1. IF HEAP[TOP - 1] >= HEAP[TOP] THEN HEAP[TOP - 1] = 1 ELSE HEAP[TOP - 1] = 0
                 2. TOP = TOP - 1
         """
-        self.file.write("CMYI\n")
+        self.file.write(f"{MepaWriter.padding}CMYI\n")
         pass
 
     # Jump instructions
@@ -191,7 +191,7 @@ class MepaWriter:
                 
                 1. i = LABEL_HASHMAP[label]
         """
-        self.file.write(f"DSVS {label}\n")
+        self.file.write(f"{MepaWriter.padding}DSVS {label}\n")
         pass
     
     def jz(self, label:str ):
@@ -202,7 +202,7 @@ class MepaWriter:
                 1. IF HEAP[TOP] = 0 THEN i = LABEL_HASHMAP[label] ELSE i = i + 1
                 2. TOP = TOP - 1
         """
-        self.file.write(f"DSVF {label}\n")
+        self.file.write(f"{MepaWriter.padding}DSVF {label}\n")
         pass
 
     def nop(self, label:str ):
@@ -211,7 +211,7 @@ class MepaWriter:
             Do:
                 1. LABEL_HASHMAP[label] = i - 1 
         """
-        self.file.write(f"{label} NADA\n")
+        self.file.write(f"{label}{MepaWriter.padding}NADA\n")
         pass
     
     # Read/write instruction
@@ -222,7 +222,7 @@ class MepaWriter:
                 1. TOP = TOP + 1
                 2. HEAP[TOP] = input sent by stream
         """
-        self.file.write(f"LEER\n")
+        self.file.write(f"{MepaWriter.padding}LEER\n")
         pass
 
     def write(self):
@@ -233,7 +233,7 @@ class MepaWriter:
                 1. print HEAP[TOP]
                 2. TOP = TOP - 1
         """
-        self.file.write(f"IMPR\n")
+        self.file.write(f"{MepaWriter.padding}IMPR\n")
         pass
 
     # Push instructions
@@ -245,7 +245,7 @@ class MepaWriter:
                 1. TOP = TOP + 1
                 1. HEAP[TOP] = constant_value
         """
-        self.file.write(f"APCT {constant_value}\n")
+        self.file.write(f"{MepaWriter.padding}APCT {constant_value}\n")
         pass
     
     def push_v(self, scope_level: int ,variable_offset: int ):
@@ -256,7 +256,7 @@ class MepaWriter:
                 1. TOP = TOP + 1
                 2. HEAP[TOP] = HEAP[DISPLAY[scope_level] + variable_offset ]
         """
-        self.file.write(f"APVL {scope_level}, {variable_offset}\n")
+        self.file.write(f"{MepaWriter.padding}APVL {scope_level}, {variable_offset}\n")
         pass
     
     # Store
@@ -268,7 +268,7 @@ class MepaWriter:
                 1. HEAP[DISPLAY[scope_level] + variable_offset ] = HEAP[TOP]
                 2. TOP = TOP - 1
         """
-        self.file.write(f"ALVL {scope_level}, {variable_offset}\n")
+        self.file.write(f"{MepaWriter.padding}ALVL {scope_level}, {variable_offset}\n")
         pass
     
     # Programs and procedures
@@ -280,7 +280,7 @@ class MepaWriter:
                 1. TOP = - 1
                 2. DISPLAY[0] = 0
         """
-        self.file.write("INPP\n")
+        self.file.write(f"{MepaWriter.padding}INPP\n")
         pass
     
     def enter(self, procedure_level: int, label: str):
@@ -292,7 +292,7 @@ class MepaWriter:
                 2. HEAP[TOP] = DISPLAY[procedure_level]
                 3. DISPLAY[procedure_level] = TOP + 1
         """
-        self.file.write(f"{label} ENPR {procedure_level}\n")
+        self.file.write(f"{label}{MepaWriter.padding}ENPR {procedure_level}\n")
         pass
     
     def call(self, procedure_label: int):
@@ -304,7 +304,7 @@ class MepaWriter:
                 2. HEAP[TOP] = i + 1
                 3. i = LABEL_HASHMAP[procedure_label]
         """
-        self.file.write(f"LLPR {procedure_label}\n")
+        self.file.write(f"{MepaWriter.padding}LLPR {procedure_label}\n")
         pass
     
     def malloc(self, memory_to_alloc: int):
@@ -315,7 +315,7 @@ class MepaWriter:
                 1. TOP = TOP + memory_to_alloc
                 
         """
-        self.file.write(f"RMEM {memory_to_alloc}\n")
+        self.file.write(f"{MepaWriter.padding}RMEM {memory_to_alloc}\n")
         pass
     
     def free(self, memory_to_free: int):
@@ -325,7 +325,7 @@ class MepaWriter:
                 
                 1. TOP = TOP - memory_to_free
         """
-        self.file.write(f"LMEM {memory_to_free}\n")
+        self.file.write(f"{MepaWriter.padding}LMEM {memory_to_free}\n")
         pass
     
     def _return(self, procedure_level: int, memory_required_by_parameters: int):
@@ -337,14 +337,14 @@ class MepaWriter:
                 2. i = HEAP[TOP - 1]
                 1. TOP = TOP - (memory_required_by_parameters + 2)
         """
-        self.file.write(f"RTPR {procedure_level}, {memory_required_by_parameters}\n")
+        self.file.write(f"{MepaWriter.padding}RTPR {procedure_level}, {memory_required_by_parameters}\n")
         pass
     
     def halt(self):
         """
             Write PARA.
         """
-        self.file.write("PARA\n")
+        self.file.write(f"{MepaWriter.padding}PARA\n")
         pass
 
     pass
