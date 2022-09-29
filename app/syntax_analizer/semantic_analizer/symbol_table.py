@@ -60,13 +60,14 @@ class SymbolTable:
             pass
         pass
     
-    def getSymbol(self, symbol_signature: str)->Symbol:
+    def getSymbol(self, symbol_signature: str):
+        # Return symbol and scope_level
         symbol= self.scope_content.get(symbol_signature,None)
         if(symbol != None):
-            return symbol
+            return symbol, self.scope_level
         if(self.parent_symbol_table != None):
             return self.parent_symbol_table.getSymbol(symbol_signature)
-        return None
+        return None,-1
     
     def addSymbol(self, symbol_to_add:Symbol):
         if self.isInLocalTable(symbol_to_add):

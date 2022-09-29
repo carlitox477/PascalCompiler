@@ -14,13 +14,6 @@ class DeclarationRulesRecognizer:
     mepa_writer= None
 
     @staticmethod
-    def setMepaWriter(mepa_writer: MepaWriter):
-        print(mepa_writer)
-        DeclarationRulesRecognizer.mepa_writer=mepa_writer
-        CommandRulesRecognizer.setMepaWriter(mepa_writer)
-        pass
-
-    @staticmethod
     def verify_block_rule(pending_source_code:str,current_column:int, current_row:int, symbol_table: SymbolTable, is_program=False) -> Tuple[str,int,int]:
         """
             Identifies rule: <bloque> ::= [<parte_declaracion_de_variables>] [<parte_declaracion_de_subrutinas>] <comando_compuesto>

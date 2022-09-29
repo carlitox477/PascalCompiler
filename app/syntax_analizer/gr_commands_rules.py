@@ -165,7 +165,8 @@ class CommandRulesRecognizer:
             # Verify if identifier is in symbol table
             SemanticErrorAnalyzer.check_var_identifier_is_accesible(identifier_token,symbol_table)
             identifier_signature = identifier_token.getAttribute("name")
-            expected_datatype = symbol_table.getSymbol(identifier_signature).output_type
+            identifier_symbol,_ = symbol_table.getSymbol(identifier_signature)
+            expected_datatype = identifier_symbol.output_type
             pending_source_code,current_column,current_row=CommandRulesRecognizer.verify_rest_of_assignation_rule(pending_source_code,current_column,current_row,symbol_table,expected_datatype)
         elif success_open_par:
             # IMPORTANT: By design decision, only procedure are callable here

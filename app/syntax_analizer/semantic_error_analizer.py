@@ -8,7 +8,8 @@ class SemanticErrorAnalyzer:
     @staticmethod
     def check_var_identifier_is_accesible(var_identifier_token: Token, symbol_table: SymbolTable):
         identifer_name=var_identifier_token.getAttribute("name")
-        if(symbol_table.getSymbol(identifer_name)==None):
+        identifer_symbol,_=symbol_table.getSymbol(identifer_name)
+        if(identifer_symbol==None):
             raise SemanticException(f"SEMANTIC ERROR: {identifer_name}[VAR] in line {var_identifier_token.row} column {var_identifier_token.column} was never declared")
         pass
     
@@ -16,7 +17,8 @@ class SemanticErrorAnalyzer:
     def check_var_identifier_is_specific_datatype(var_identifier_token: Token, symbol_table: SymbolTable, datatype: str):
         if(datatype != None):
             identifer_name=var_identifier_token.getAttribute("name")
-            if(symbol_table.getSymbol(symbol_table.getSymbol(identifer_name)).output_type!=datatype):
+            identifier_symbol,_=symbol_table.getSymbol(identifer_name)
+            if(identifier_symbol.output_type!=datatype):
                 raise SemanticException(f"SEMANTIC ERROR: {identifer_name}[VAR] in line {var_identifier_token.row} column {var_identifier_token.column} should be {datatype} according to previous identifier declaration in list")
             pass   
         pass
@@ -33,7 +35,7 @@ class SemanticErrorAnalyzer:
     def check_procedure_is_callable(procedure_identifier_token: Token,parameters_datatypes:list, symbol_table: SymbolTable):
         procedure_name= procedure_identifier_token.getAttribute("name")
         procedure_signature = get_signature(procedure_name,parameters_datatypes)
-        assumed_procedure_symbol=symbol_table.getSymbol(procedure_signature)
+        assumed_procedure_symbol,_=symbol_table.getSymbol(procedure_signature)
         if(assumed_procedure_symbol == None):
             raise SemanticException(f"SEMANTIC ERROR: {procedure_signature} procedure in line {procedure_identifier_token.row} column {procedure_identifier_token.column} was never decleared or it is inaccesible")
 
@@ -46,7 +48,7 @@ class SemanticErrorAnalyzer:
         function_name= function_identifier_token.getAttribute("name")
         function_signature =get_signature(function_name,parameters_datatypes)
         #print(function_signature)
-        assumed_function_symbol=symbol_table.getSymbol(function_signature)
+        assumed_function_symbol,_=symbol_table.getSymbol(function_signature)
         if(assumed_function_symbol == None):
             raise SemanticException(f"SEMANTIC ERROR: {function_signature} function in line {function_identifier_token.row} column {function_identifier_token.column} was never decleared or it is inaccesible")
 
@@ -67,8 +69,8 @@ class SemanticErrorAnalyzer:
             datatypes_str=datatypes_str[:-1]
         signature=f"{function_name}({datatypes_str})"
         
-
-        if(symbol_table.getSymbol(signature)==None):
+        function_symbol,_=symbol_table.getSymbol(signature)
+        if(function_symbol==None):
             raise SemanticException(f"SEMANTIC ERROR: {signature} function in line {function_identifier_token.row} column {function_identifier_token.column} is not accesible or does not exist")   
         pass
 

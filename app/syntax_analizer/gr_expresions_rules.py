@@ -15,12 +15,6 @@ class ExpresionRulesRecognizer:
     mepa_writer= None
 
     @staticmethod
-    def setMepaWriter(mepa_writer: MepaWriter):
-        print(mepa_writer)
-        ExpresionRulesRecognizer.mepa_writer=mepa_writer
-        pass
-
-    @staticmethod
     def verify_identifier_list_rule(pending_source_code: str, current_column: int, current_row: int, symbol_table: SymbolTable) -> Tuple[str,int,int]:
         # Done
         """
@@ -43,6 +37,8 @@ class ExpresionRulesRecognizer:
         pending_source_code,current_column, current_row,identifier_token,_= match_token('TK_identifier',pending_source_code,current_column, current_row,None,True)
         # Check identifier are in symbol table, these identifier can only be VAR
         SemanticErrorAnalyzer.check_var_identifier_is_accesible(identifier_token,symbol_table)
+        identifiers_signatures_list=[]
+        identifiers_signatures_list.append(identifier_token.getAttribute("name")) # The name is the signature
 
         while identifier_token != None:
             
@@ -53,8 +49,10 @@ class ExpresionRulesRecognizer:
             if identifier_token != None:
                 pending_source_code,current_column, current_row,identifier_token, _= match_token('TK_identifier',pending_source_code,current_column, current_row, None, True)
                 SemanticErrorAnalyzer.check_var_identifier_is_accesible(identifier_token,symbol_table)
+                identifiers_signatures_list.append(identifier_token.getAttribute("name"))
             pass
-        return pending_source_code,current_column, current_row
+        # print(f"IDENTIFIER LIST: {identifier_list}")
+        return pending_source_code,current_column, current_row,identifiers_signatures_list
 
     @staticmethod
     def verify_write_command_rule(pending_source_code:str,current_column:int, current_row:int, symbol_table: SymbolTable) -> Tuple[str,int,int]:
@@ -98,8 +96,18 @@ class ExpresionRulesRecognizer:
         
         pending_source_code,current_column,current_row,_,_ = match_token('TK_read',pending_source_code,current_column,current_row)
         pending_source_code,current_column,current_row,_,_=match_token('TK_parenthesis',pending_source_code,current_column,current_row,{"type": ['OPPAR']})
-        pending_source_code,current_column,current_row=ExpresionRulesRecognizer.verify_identifier_list_rule(pending_source_code,current_column,current_row,symbol_table)
+        pending_source_code,current_column,current_row,identifiers_signatures_list=ExpresionRulesRecognizer.verify_identifier_list_rule(pending_source_code,current_column,current_row,symbol_table)
         pending_source_code,current_column,current_row,_,_=match_token('TK_parenthesis',pending_source_code,current_column,current_row,{"type": ['CLPAR']})
+        
+        # MEPA
+        for id_signature in identifiers_signatures_list:
+            id_symbol,symbol_level=symbol_table.getSymbol(id_signature)
+            # First read, then asignate to variable
+            ExpresionRulesRecognizer.mepa_writer.read()
+            ExpresionRulesRecognizer.mepa_writer.store(symbol_level,id_symbol.offset)
+            # MepaWriter("")
+            pass
+        
         return pending_source_code,current_column,current_row
 
     @staticmethod
@@ -321,7 +329,8 @@ class ExpresionRulesRecognizer:
                 SemanticErrorAnalyzer.check_function_or_procedure_is_accesible(identifier_token,parameters_datatypes,symbol_table)
                 function_signature= get_signature(identifier_token.getAttribute("name"),parameters_datatypes)
                 #print(function_signature)
-                output_datatype=symbol_table.getSymbol(function_signature).output_type
+                function_symbol,_=symbol_table.getSymbol(function_signature)
+                output_datatype=function_symbol.output_type
                 if(output_datatype==None):       
                     raise SemanticException(f"{function_signature} in line {identifier_token.row} column {identifier_token.column} is accessed as a PROCEDURE, and it must be a FUNCTION")
                 pass
@@ -329,7 +338,8 @@ class ExpresionRulesRecognizer:
                 # Look identifier datatype in symbol table
                 SemanticErrorAnalyzer.check_var_identifier_is_accesible(identifier_token,symbol_table)
                 var_signature= identifier_token.getAttribute("name")
-                output_datatype=symbol_table.getSymbol(var_signature).output_type
+                var_symbol,_=symbol_table.getSymbol(var_signature)
+                output_datatype=var_symbol.output_type
                 pass
             
             if(expected_datatype!= None and expected_datatype!=output_datatype):
