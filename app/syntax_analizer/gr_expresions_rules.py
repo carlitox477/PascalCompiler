@@ -1,6 +1,6 @@
 from typing import Tuple
 
-from app.syntax_analizer.mepa_writer import MepaWriter
+from .mepa_writer import MepaWriter
 from .utils import get_signature
 from .lexical_analizer.automatas.token import Token
 from .semantic_analizer.semantic_exception import SemanticException
@@ -12,6 +12,14 @@ from .syntax_exception import SyntaxException
 
 
 class ExpresionRulesRecognizer:
+    mepa_writer= None
+
+    @staticmethod
+    def setMepaWriter(mepa_writer: MepaWriter):
+        print(mepa_writer)
+        ExpresionRulesRecognizer.mepa_writer=mepa_writer
+        pass
+
     @staticmethod
     def verify_identifier_list_rule(pending_source_code: str, current_column: int, current_row: int, symbol_table: SymbolTable) -> Tuple[str,int,int]:
         # Done
@@ -31,6 +39,7 @@ class ExpresionRulesRecognizer:
         
         # At list one identifier
         # Try to find <identificador>, which can only be a VAR
+        #print(mepa_writer)
         pending_source_code,current_column, current_row,identifier_token,_= match_token('TK_identifier',pending_source_code,current_column, current_row,None,True)
         # Check identifier are in symbol table, these identifier can only be VAR
         SemanticErrorAnalyzer.check_var_identifier_is_accesible(identifier_token,symbol_table)
@@ -48,7 +57,7 @@ class ExpresionRulesRecognizer:
         return pending_source_code,current_column, current_row
 
     @staticmethod
-    def verify_write_command_rule(pending_source_code:str,current_column:int, current_row:int, symbol_table: SymbolTable,mepa_writer:MepaWriter) -> Tuple[str,int,int]:
+    def verify_write_command_rule(pending_source_code:str,current_column:int, current_row:int, symbol_table: SymbolTable) -> Tuple[str,int,int]:
         """
         Identifies rule: <comando_salida> ::= write(<lista_de_expresiones>)
             
@@ -65,7 +74,7 @@ class ExpresionRulesRecognizer:
         pending_source_code,current_column,current_row,_,_ = match_token('TK_write',pending_source_code,current_column,current_row)
         pending_source_code,current_column,current_row,_,_ = match_token('TK_parenthesis',pending_source_code,current_column,current_row,{"type": ['OPPAR']})
 
-        pending_source_code,current_column,current_row,_=ExpresionRulesRecognizer.verify_expresion_list_rule(pending_source_code,current_column,current_row,symbol_table,mepa_writer)
+        pending_source_code,current_column,current_row,_=ExpresionRulesRecognizer.verify_expresion_list_rule(pending_source_code,current_column,current_row,symbol_table)
         
         pending_source_code,current_column,current_row,_,_ = match_token('TK_parenthesis',pending_source_code,current_column,current_row,{"type": ['CLPAR']})
         return pending_source_code,current_column,current_row
@@ -94,7 +103,7 @@ class ExpresionRulesRecognizer:
         return pending_source_code,current_column,current_row
 
     @staticmethod
-    def verify_expresion_rule(pending_source_code:str,current_column:int, current_row:int, symbol_table: SymbolTable, mepa_writer: MepaWriter,expected_type=None) -> Tuple[str,int,int]:
+    def verify_expresion_rule(pending_source_code:str,current_column:int, current_row:int, symbol_table: SymbolTable,expected_type=None) -> Tuple[str,int,int]:
         # DONE
         """
         Identifies rule: <expresion> ::= <expresion_simple> {<operador_relacional> <expresion_simple> }
@@ -112,16 +121,6 @@ class ExpresionRulesRecognizer:
         # literal_booleano means that the expresion type is zero
         # Both expresion_simple should be the same type
         # If first expresion_simple is boolean only == and <> are valid
-
-        # Tries to find <literal_booleano>
-        #try:
-        #    pending_source_code,current_column, current_row,literal_token,_=match_token('TK_boolean_literal',pending_source_code,current_column, current_row)
-        #    # Check if it gets expected datatype
-        #    SemanticErrorAnalyzer.check_correct_literal_datatype("BOOLEAN",literal_token.row,literal_token.column,expected_type)
-
-        #    return pending_source_code,current_column, current_row,literal_token,"BOOLEAN"
-        #except SyntaxException:
-        #    pass
         
         # Tries to find <expresion_simple>
         first_expected_type=None
@@ -137,8 +136,8 @@ class ExpresionRulesRecognizer:
             while perfom_relation_operation:            
                 pending_source_code,current_column, current_row,relop_token,_=match_token('TK_relOp',pending_source_code,current_column, current_row)
                 SemanticErrorAnalyzer.check_expresion_relational_operator_error(relop_token, expected_type,previous_type)
-                
-                pending_source_code,current_column, current_row,next_datatype=ExpresionRulesRecognizer.verify_simple_expresion_rule(pending_source_code,current_column, current_row,mepa_writer,first_expresion_datatype)
+                #print(mepa_writer)
+                pending_source_code,current_column, current_row,next_datatype=ExpresionRulesRecognizer.verify_simple_expresion_rule(pending_source_code,current_column, current_row,first_expresion_datatype)
                 #pending_source_code,current_column, current_row,second_expresion_datatype=ExpresionRulesRecognizer.verify_simple_expresion_rule(pending_source_code,current_column, current_row,first_expresion_datatype)
                 # SemanticErrorAnalyzer.check_comparison_datatypes(first_expresion_datatype,second_expresion_datatype, relop_token)
                 previous_type= next_datatype
@@ -151,7 +150,7 @@ class ExpresionRulesRecognizer:
         return pending_source_code,current_column, current_row,output_type
 
     @staticmethod
-    def verify_simple_expresion_rule(pending_source_code:str,current_column:int, current_row:int, symbol_table: SymbolTable,mepa_writer:MepaWriter,expected_datatype=None) -> Tuple[str,int,int]:
+    def verify_simple_expresion_rule(pending_source_code:str,current_column:int, current_row:int, symbol_table: SymbolTable,expected_datatype=None) -> Tuple[str,int,int]:
         # DONE
         """
         Identifies rule: <expresion_simple> ::= [ + | - ] <termino> { ( + | - | or ) <termino> }
@@ -177,7 +176,8 @@ class ExpresionRulesRecognizer:
             pass
         from_row=current_row
         from_col=current_column
-        pending_source_code,current_column, current_row,first_term_datatype=ExpresionRulesRecognizer.verify_term_rule(pending_source_code,current_column, current_row,symbol_table,mepa_writer,expected_datatype)
+        #print(mepa_writer)
+        pending_source_code,current_column, current_row,first_term_datatype=ExpresionRulesRecognizer.verify_term_rule(pending_source_code,current_column, current_row,symbol_table,expected_datatype)
         
         # Boolean with boolean, integer with integer
         if(expected_datatype != None and expected_datatype!=first_term_datatype):
@@ -199,7 +199,8 @@ class ExpresionRulesRecognizer:
             
             from_row=current_row
             from_col=current_column
-            pending_source_code,current_column, current_row, term_datatype=ExpresionRulesRecognizer.verify_term_rule(pending_source_code,current_column, current_row,symbol_table,mepa_writer)
+            #print(f"194 - {mepa_writer}")
+            pending_source_code,current_column, current_row, term_datatype=ExpresionRulesRecognizer.verify_term_rule(pending_source_code,current_column, current_row,symbol_table)
             #print(pending_source_code)
             if(term_datatype != first_term_datatype):
                 raise SemanticException(f"SEMANTIC ERROR: Expected term type {first_term_datatype}, but it is {term_datatype} in (r:{from_row},c:{from_col})-(r:{current_row},c:{current_column})")
@@ -213,7 +214,7 @@ class ExpresionRulesRecognizer:
         return pending_source_code,current_column, current_row, first_term_datatype
 
     @staticmethod
-    def verify_term_rule(pending_source_code:str,current_column:int, current_row:int, symbol_table: SymbolTable,mepa_writer:MepaWriter, expected_datatype=None) -> Tuple[str,int,int]:
+    def verify_term_rule(pending_source_code:str,current_column:int, current_row:int, symbol_table: SymbolTable, expected_datatype=None) -> Tuple[str,int,int]:
         # DONE
         """
         Identifies rule: <termino> ::= <factor> { ( * | / | and ) <factor> }
@@ -232,7 +233,8 @@ class ExpresionRulesRecognizer:
         # First factor type determines if we want an "and" or not, and second factor type
         from_row,from_col=current_row,current_column
         #print(symbol_table.to_string())
-        pending_source_code,current_column, current_row,first_factor_datatype=ExpresionRulesRecognizer.verify_factor_rule(pending_source_code,current_column, current_row,symbol_table,mepa_writer)
+        #print(f"228 - {mepa_writer}")
+        pending_source_code,current_column, current_row,first_factor_datatype=ExpresionRulesRecognizer.verify_factor_rule(pending_source_code,current_column, current_row,symbol_table)
         if(expected_datatype!= None and expected_datatype!=first_factor_datatype):
             raise SemanticException(f"SEMANTIC ERROR: Expected factor type {expected_datatype}, but it is {first_factor_datatype} in (r:{from_row},c:{from_col})-(r:{current_row},c:{current_column})")
         
@@ -250,7 +252,7 @@ class ExpresionRulesRecognizer:
 
             from_row,from_col=current_row,current_column
             
-            pending_source_code,current_column, current_row, factor_type=ExpresionRulesRecognizer.verify_factor_rule(pending_source_code,current_column, current_row,symbol_table,mepa_writer)        
+            pending_source_code,current_column, current_row, factor_type=ExpresionRulesRecognizer.verify_factor_rule(pending_source_code,current_column, current_row,symbol_table)        
             if(first_factor_datatype != factor_type):
                 raise SemanticException(f"SEMANTIC ERROR: Expected term type {first_factor_datatype}, but it is {factor_type} in (r:{from_row},c:{from_col})-(r:{current_row},c:{current_column})")
             
@@ -260,7 +262,7 @@ class ExpresionRulesRecognizer:
         return pending_source_code,current_column, current_row,first_factor_datatype
 
     @staticmethod
-    def verify_factor_rule(pending_source_code:str,current_column:int, current_row:int, symbol_table: SymbolTable,mepa_writer: MepaWriter, expected_datatype=None) -> Tuple[str,int,int]:
+    def verify_factor_rule(pending_source_code:str,current_column:int, current_row:int, symbol_table: SymbolTable, expected_datatype=None) -> Tuple[str,int,int]:
         """
         Identifies rule: <factor> ::= <literal_booleano> | <identificador> | <numero> | <llamada_funcion> | NOT <factor> | "(" <expresion> ")" | <
             
@@ -284,11 +286,12 @@ class ExpresionRulesRecognizer:
         
         # <literal_booleano>
         try:
-            #print(pending_source_code)
             pending_source_code,current_column, current_row,literal_token,_=match_token('TK_boolean_literal',pending_source_code,current_column, current_row)
             # Check if it gets expected datatype
             SemanticErrorAnalyzer.check_correct_literal_datatype("BOOLEAN",literal_token.row,literal_token.column,expected_datatype)
             
+            # MEPA: push literal in the heap
+            ExpresionRulesRecognizer.mepa_writer.push_c(literal_token.getAttribute("value"))
             
             return pending_source_code,current_column, current_row, "BOOLEAN"
         except SyntaxException:
@@ -313,7 +316,8 @@ class ExpresionRulesRecognizer:
 
             if success_open_par:
                 # Function
-                pending_source_code,current_column, current_row,parameters_datatypes=ExpresionRulesRecognizer.verify_rest_of_function_call_rule(pending_source_code,current_column, current_row,symbol_table, identifier_token,mepa_writer)
+                #print(mepa_writer)
+                pending_source_code,current_column, current_row,parameters_datatypes=ExpresionRulesRecognizer.verify_rest_of_function_call_rule(pending_source_code,current_column, current_row,symbol_table, identifier_token)
                 SemanticErrorAnalyzer.check_function_or_procedure_is_accesible(identifier_token,parameters_datatypes,symbol_table)
                 function_signature= get_signature(identifier_token.getAttribute("name"),parameters_datatypes)
                 #print(function_signature)
@@ -346,6 +350,8 @@ class ExpresionRulesRecognizer:
         except SyntaxException:
             success_tk_number = False
         if success_tk_number:
+            # MEPA: push literal in the heap
+            ExpresionRulesRecognizer.mepa_writer.push_c(number_token.getAttribute("value"))
             return pending_source_code,current_column, current_row,"INTEGER"
         
         # not <factor>
@@ -373,7 +379,7 @@ class ExpresionRulesRecognizer:
         raise SyntaxException(f"SYNTAX ERROR: Expected to find a token in {valid_first_tokens}, but found other in row {current_row}, column {current_column}")
 
     @staticmethod
-    def verify_expresion_list_rule(pending_source_code:str,current_column:int, current_row:int, symbol_table: SymbolTable,mepa_writer:MepaWriter) -> Tuple[str,int,int]:
+    def verify_expresion_list_rule(pending_source_code:str,current_column:int, current_row:int, symbol_table: SymbolTable) -> Tuple[str,int,int]:
         # DONE
         """
         Identifies rule: <lista_de_expresiones> ::= <expresion_simple> { , <expresion_simple> }
@@ -390,7 +396,7 @@ class ExpresionRulesRecognizer:
         """
         # Return list of expresion types
         datatype_list=[]
-        pending_source_code,current_column, current_row,expression_datatype=ExpresionRulesRecognizer.verify_simple_expresion_rule(pending_source_code,current_column, current_row,symbol_table,mepa_writer)
+        pending_source_code,current_column, current_row,expression_datatype=ExpresionRulesRecognizer.verify_simple_expresion_rule(pending_source_code,current_column, current_row,symbol_table)
         datatype_list.append(expression_datatype)
 
         success_comma = True
@@ -402,13 +408,13 @@ class ExpresionRulesRecognizer:
                 success_comma = False
                 pass
             if success_comma:
-                pending_source_code,current_column, current_row,expression_datatype=ExpresionRulesRecognizer.verify_simple_expresion_rule(pending_source_code,current_column, current_row,symbol_table,mepa_writer)
+                pending_source_code,current_column, current_row,expression_datatype=ExpresionRulesRecognizer.verify_simple_expresion_rule(pending_source_code,current_column, current_row,symbol_table)
                 datatype_list.append(expression_datatype)
             pass
         return pending_source_code,current_column, current_row,datatype_list
 
     @staticmethod
-    def verify_rest_of_function_call_rule(pending_source_code:str,current_column:int, current_row:int,symbol_table: SymbolTable, function_identifier_token: Token, mepa_writer: MepaWriter,is_procedure=False) -> Tuple[str,int,int]:
+    def verify_rest_of_function_call_rule(pending_source_code:str,current_column:int, current_row:int,symbol_table: SymbolTable, function_identifier_token: Token,is_procedure=False) -> Tuple[str,int,int]:
         # Done
         """
         Identifies rule: <resto_llamada_funcion> ::= "(" <lista_de_expresiones> ")"
@@ -424,7 +430,8 @@ class ExpresionRulesRecognizer:
                 current_row(int): Row where the updated look ahead is
         """
         pending_source_code,current_column, current_row,_,_ = match_token('TK_parenthesis',pending_source_code,current_column, current_row,{"type": ['OPPAR']})
-        pending_source_code,current_column, current_row,expresions_datatypes = ExpresionRulesRecognizer.verify_expresion_list_rule(pending_source_code,current_column, current_row,symbol_table,mepa_writer)
+        #print(mepa_writer)
+        pending_source_code,current_column, current_row,expresions_datatypes = ExpresionRulesRecognizer.verify_expresion_list_rule(pending_source_code,current_column, current_row,symbol_table)
         pending_source_code,current_column, current_row,_,_ = match_token('TK_parenthesis',pending_source_code,current_column, current_row,{"type": ['CLPAR']})
         
         # Check function is accesible from table

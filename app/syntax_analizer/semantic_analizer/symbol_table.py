@@ -197,7 +197,6 @@ class SymbolTable:
     def add_return_slot(self,return_symbol: Symbol):
         return_symbol.offset=-1
         self.scope_content[return_symbol.get_signature()]=return_symbol
-        print(f"AFTER ADDING RETURN SLOT: {self.get_label()} OFFSET: {self.offset}")
         pass
     
     def get_label(self):

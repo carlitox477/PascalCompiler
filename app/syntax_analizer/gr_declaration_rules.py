@@ -1,6 +1,5 @@
 
 from typing import Tuple
-from xmlrpc.client import boolean
 from .mepa_writer import MepaWriter
 
 from syntax_analizer.semantic_analizer.symbol import Symbol
@@ -12,8 +11,17 @@ from .utils import match_token, create_symbol_list_from_identifier_list
 from .gr_commands_rules import CommandRulesRecognizer
 
 class DeclarationRulesRecognizer:
+    mepa_writer= None
+
     @staticmethod
-    def verify_block_rule(pending_source_code:str,current_column:int, current_row:int, symbol_table: SymbolTable, mepa_writer: MepaWriter, is_program=False) -> Tuple[str,int,int]:
+    def setMepaWriter(mepa_writer: MepaWriter):
+        print(mepa_writer)
+        DeclarationRulesRecognizer.mepa_writer=mepa_writer
+        CommandRulesRecognizer.setMepaWriter(mepa_writer)
+        pass
+
+    @staticmethod
+    def verify_block_rule(pending_source_code:str,current_column:int, current_row:int, symbol_table: SymbolTable, is_program=False) -> Tuple[str,int,int]:
         """
             Identifies rule: <bloque> ::= [<parte_declaracion_de_variables>] [<parte_declaracion_de_subrutinas>] <comando_compuesto>
             
@@ -29,23 +37,23 @@ class DeclarationRulesRecognizer:
         """
         if(not(is_program)):
             # Function or procedure first instruction must be ENPR:
-            mepa_writer.enter(symbol_table.scope_level,symbol_table.get_label())
+            DeclarationRulesRecognizer.mepa_writer.enter(symbol_table.scope_level,symbol_table.get_label())
 
 
 
-        pending_source_code,current_column, current_row=DeclarationRulesRecognizer.verify_variables_declaration_part_rule(pending_source_code,current_column, current_row,symbol_table,mepa_writer)
+        pending_source_code,current_column, current_row=DeclarationRulesRecognizer.verify_variables_declaration_part_rule(pending_source_code,current_column, current_row,symbol_table)
         
         if(is_program):
-            mepa_writer.jmp(symbol_table.get_label())
-        pending_source_code,current_column, current_row=DeclarationRulesRecognizer.verify_subrutine_declaration_part_rule(pending_source_code,current_column, current_row,symbol_table,mepa_writer)
+            DeclarationRulesRecognizer.mepa_writer.jmp(symbol_table.get_label())
+        pending_source_code,current_column, current_row=DeclarationRulesRecognizer.verify_subrutine_declaration_part_rule(pending_source_code,current_column, current_row,symbol_table)
 
         if(is_program):
-            mepa_writer.nop(symbol_table.get_label())
-        pending_source_code,current_column, current_row=CommandRulesRecognizer.verify_compound_command_rule(pending_source_code,current_column, current_row,symbol_table,mepa_writer)
+            DeclarationRulesRecognizer.mepa_writer.nop(symbol_table.get_label())
+        pending_source_code,current_column, current_row=CommandRulesRecognizer.verify_compound_command_rule(pending_source_code,current_column, current_row,symbol_table)
         return pending_source_code,current_column, current_row
     
     @staticmethod
-    def verify_variables_declaration_part_rule(pending_source_code:str,current_column:int, current_row:int,symbol_table: SymbolTable, mepa_writer: MepaWriter) -> Tuple[str,int,int]:
+    def verify_variables_declaration_part_rule(pending_source_code:str,current_column:int, current_row:int,symbol_table: SymbolTable) -> Tuple[str,int,int]:
         """
             Identifies rule: <parte_declaration_de_variables> ::= var <declaracion_de_variables>; {<declaracion_de_variables>;}
             
@@ -66,14 +74,14 @@ class DeclarationRulesRecognizer:
             return pending_source_code,current_column, current_row
 
         # At least one line of variables declaration
-        pending_source_code,current_column, current_row,_=DeclarationRulesRecognizer.verify_variables_declaration_rule(pending_source_code,current_column, current_row,symbol_table, mepa_writer,True)    
+        pending_source_code,current_column, current_row,_=DeclarationRulesRecognizer.verify_variables_declaration_rule(pending_source_code,current_column, current_row,symbol_table,True)    
         pending_source_code,current_column, current_row, _,_= match_token('TK_semicolon',pending_source_code,current_column, current_row)
 
         success = True
         while success:
             if success:
                 try:
-                    pending_source_code,current_column, current_row, _ = DeclarationRulesRecognizer.verify_variables_declaration_rule(pending_source_code,current_column, current_row,symbol_table,mepa_writer,True)
+                    pending_source_code,current_column, current_row, _ = DeclarationRulesRecognizer.verify_variables_declaration_rule(pending_source_code,current_column, current_row,symbol_table,True)
                 except SyntaxException:
                     success = False
                 if success:
@@ -83,7 +91,7 @@ class DeclarationRulesRecognizer:
         return pending_source_code,current_column, current_row
     
     @staticmethod
-    def verify_variables_declaration_rule(pending_source_code:str,current_column:int, current_row:int,symbol_table: SymbolTable,mepa_writer: MepaWriter, reserve_memory: bool) -> Tuple[str,int,int,list]:
+    def verify_variables_declaration_rule(pending_source_code:str,current_column:int, current_row:int,symbol_table: SymbolTable, reserve_memory: bool) -> Tuple[str,int,int,list]:
         """
             Identifies rule: <declaracion_de_variables> ::= <lista_de_identificadores> : <tipo_de_dato>
             
@@ -116,8 +124,8 @@ class DeclarationRulesRecognizer:
 
             # MEPA
             # We reserve memory for later variables asignation
-            mepa_writer.malloc(len(symbols_to_add))
-            mepa_writer.top_write_pointer= mepa_writer.top_write_pointer + len(symbols_to_add)
+            DeclarationRulesRecognizer.mepa_writer.malloc(len(symbols_to_add))
+            DeclarationRulesRecognizer.mepa_writer.top_write_pointer= DeclarationRulesRecognizer.mepa_writer.top_write_pointer + len(symbols_to_add)
 
         pass
 
@@ -179,7 +187,7 @@ class DeclarationRulesRecognizer:
         return pending_source_code,current_column, current_row,datatype_token
 
     @staticmethod
-    def verify_subrutine_declaration_part_rule(pending_source_code:str,current_column:int, current_row:int,symbol_table: SymbolTable,mepa_writer: MepaWriter) -> Tuple[str,int,int]:
+    def verify_subrutine_declaration_part_rule(pending_source_code:str,current_column:int, current_row:int,symbol_table: SymbolTable) -> Tuple[str,int,int]:
         """
             Identifies rule: <parte_declaracion_de_subrutinas> ::= {<declaracion_de_funcion>; | <declaracion_de_procedimiento>;}
             
@@ -208,9 +216,9 @@ class DeclarationRulesRecognizer:
 
         while(function_tk_match_success or procedure_tk_match_success):
             if function_tk_match_success:
-                pending_source_code,current_column, current_row=DeclarationRulesRecognizer.verify_function_declaration_rule(pending_source_code,current_column, current_row,symbol_table,mepa_writer)
+                pending_source_code,current_column, current_row=DeclarationRulesRecognizer.verify_function_declaration_rule(pending_source_code,current_column, current_row,symbol_table)
             elif procedure_tk_match_success:
-                pending_source_code,current_column, current_row=DeclarationRulesRecognizer.verify_procedure_declaration_rule(pending_source_code,current_column, current_row,symbol_table,mepa_writer)
+                pending_source_code,current_column, current_row=DeclarationRulesRecognizer.verify_procedure_declaration_rule(pending_source_code,current_column, current_row,symbol_table)
             
             pending_source_code,current_column, current_row,_,_=match_token('TK_semicolon',pending_source_code,current_column, current_row)        
             
@@ -229,7 +237,7 @@ class DeclarationRulesRecognizer:
         return pending_source_code,current_column, current_row
 
     @staticmethod
-    def verify_procedure_declaration_rule(pending_source_code:str,current_column:int,current_row:int,symbol_table: SymbolTable, mepa_writer: MepaWriter) -> Tuple[str,int,int]:
+    def verify_procedure_declaration_rule(pending_source_code:str,current_column:int,current_row:int,symbol_table: SymbolTable) -> Tuple[str,int,int]:
         """
             Identifies rule: <declaracion_de_procedimiento> ::= procedure <identificador>[ "(" <parametros_formales> ")"]; <bloque>
             
@@ -265,7 +273,7 @@ class DeclarationRulesRecognizer:
             pass
 
         if(success):
-            pending_source_code,current_column, current_row,parameters_symbols=DeclarationRulesRecognizer.verify_formal_parameters_rule(pending_source_code,current_column, current_row,procedure_symbol_table,mepa_writer)
+            pending_source_code,current_column, current_row,parameters_symbols=DeclarationRulesRecognizer.verify_formal_parameters_rule(pending_source_code,current_column, current_row,procedure_symbol_table)
             pending_source_code,current_column, current_row,_,_=match_token('TK_parenthesis',pending_source_code,current_column, current_row,{"type": ['CLPAR']})
             
             procedure_symbol.add_parameters(parameters_symbols)
@@ -279,14 +287,14 @@ class DeclarationRulesRecognizer:
         pending_source_code,current_column, current_row,_,_=match_token('TK_semicolon',pending_source_code,current_column, current_row)
         
         
-        pending_source_code,current_column, current_row=DeclarationRulesRecognizer.verify_block_rule(pending_source_code,current_column, current_row, procedure_symbol_table,mepa_writer)
+        pending_source_code,current_column, current_row=DeclarationRulesRecognizer.verify_block_rule(pending_source_code,current_column, current_row, procedure_symbol_table)
         
         print("---------------------")
         print(procedure_symbol_table.to_string())
         return pending_source_code,current_column, current_row
 
     @staticmethod
-    def verify_function_declaration_rule(pending_source_code:str,current_column:int,current_row:int,symbol_table: SymbolTable,mepa_writer: MepaWriter) -> Tuple[str,int,int]:
+    def verify_function_declaration_rule(pending_source_code:str,current_column:int,current_row:int,symbol_table: SymbolTable) -> Tuple[str,int,int]:
         """
             Identifies rule: <declaracion_de_funcion> ::= function <identificador>[ "(" <parametros_formales> ")"] : <tipo_de_dato> ; <bloque>
             
@@ -315,7 +323,7 @@ class DeclarationRulesRecognizer:
         
         parameters_symbols=[]
         if(success):
-            pending_source_code,current_column, current_row,parameters_symbols=DeclarationRulesRecognizer.verify_formal_parameters_rule(pending_source_code,current_column, current_row,function_symbol_table,mepa_writer)
+            pending_source_code,current_column, current_row,parameters_symbols=DeclarationRulesRecognizer.verify_formal_parameters_rule(pending_source_code,current_column, current_row,function_symbol_table)
             pending_source_code,current_column, current_row,_,_=match_token('TK_parenthesis',pending_source_code,current_column, current_row,{"type": ['CLPAR']})
             pass
         pending_source_code,current_column, current_row,_,_=match_token('TK_colon',pending_source_code,current_column, current_row)
@@ -342,14 +350,14 @@ class DeclarationRulesRecognizer:
 
         pending_source_code,current_column, current_row,_,_=match_token('TK_semicolon',pending_source_code,current_column, current_row)
         
-        pending_source_code,current_column, current_row=DeclarationRulesRecognizer.verify_block_rule(pending_source_code,current_column, current_row, function_symbol_table, mepa_writer)
+        pending_source_code,current_column, current_row=DeclarationRulesRecognizer.verify_block_rule(pending_source_code,current_column, current_row, function_symbol_table)
         
         print("---------------------")
         print(function_symbol_table.to_string())
         return pending_source_code,current_column, current_row
 
     @staticmethod
-    def verify_formal_parameters_rule(pending_source_code:str,current_column:int,current_row:int,symbol_table: SymbolTable,mepa_writer: MepaWriter) -> Tuple[str,int,int,list]:
+    def verify_formal_parameters_rule(pending_source_code:str,current_column:int,current_row:int,symbol_table: SymbolTable) -> Tuple[str,int,int,list]:
         """
             Identifies rule: <parametros_formales> ::= <seccion_declaracion_de_variables> { ; <seccion_declaracion_de_variables> }
             
@@ -363,7 +371,7 @@ class DeclarationRulesRecognizer:
                 current_column(int): Column where the updated look ahead is
                 current_row(int): Row where the updated look ahead is
         """
-        pending_source_code,current_column,current_row,variable_symbol_list=DeclarationRulesRecognizer.verify_variables_declaration_section_rule(pending_source_code,current_column,current_row,symbol_table,mepa_writer, False)        
+        pending_source_code,current_column,current_row,variable_symbol_list=DeclarationRulesRecognizer.verify_variables_declaration_section_rule(pending_source_code,current_column,current_row,symbol_table, False)        
         continue_analysis=True
         while continue_analysis:
             try:
@@ -372,14 +380,14 @@ class DeclarationRulesRecognizer:
                 continue_analysis = False
 
             if continue_analysis:
-                pending_source_code,current_column,current_row,more_variable_symbol_list=DeclarationRulesRecognizer.verify_variables_declaration_section_rule(pending_source_code,current_column,current_row,symbol_table, mepa_writer,False)
+                pending_source_code,current_column,current_row,more_variable_symbol_list=DeclarationRulesRecognizer.verify_variables_declaration_section_rule(pending_source_code,current_column,current_row,symbol_table,False)
                 variable_symbol_list.extend(more_variable_symbol_list)
                 pass        
             pass
         return pending_source_code,current_column,current_row,variable_symbol_list
 
     @staticmethod
-    def verify_variables_declaration_section_rule(pending_source_code:str,current_column:int,current_row:int,symbol_table: SymbolTable, mepa_writer: MepaWriter, reserve_memory: bool) -> Tuple[str,int,int,list]:
+    def verify_variables_declaration_section_rule(pending_source_code:str,current_column:int,current_row:int,symbol_table: SymbolTable, reserve_memory: bool) -> Tuple[str,int,int,list]:
         """
             Identifies rule: <seccion_declaracion_de_variables> ::= [ var ] <declaracion_de_variables>
             
@@ -395,7 +403,7 @@ class DeclarationRulesRecognizer:
         """
         # Optional
         pending_source_code,current_column,current_row,_,_=match_token('TK_var',pending_source_code,current_column, current_row, [], False)
-        pending_source_code,current_column,current_row, variables_symbols=DeclarationRulesRecognizer.verify_variables_declaration_rule(pending_source_code,current_column,current_row,symbol_table,mepa_writer,reserve_memory)
+        pending_source_code,current_column,current_row, variables_symbols=DeclarationRulesRecognizer.verify_variables_declaration_rule(pending_source_code,current_column,current_row,symbol_table,reserve_memory)
         return pending_source_code,current_column,current_row,variables_symbols
         
 
