@@ -4,10 +4,12 @@
 l1_func(INTEGER, INTEGER)[1]		ENPR 1
 		RMEM 1
 		APCT 3
+		ALVL 1, 0
 		APVL 1, 0
 		APVL 1, -4
 		APVL 1, -3
 		APVL 1, -3
+		ALVL 1, -5
 		LMEM 1
 		RTPR 1, 2
 l0_java()[0]		NADA
@@ -18,5 +20,6 @@ l0_java()[0]		NADA
 		APCT 4
 		APCT 3
 		APCT 4
+		ALVL 0, 0
 		LMEM 1
 		PARA

@@ -1,6 +1,8 @@
 
 from typing import Tuple
 
+from app.syntax_analizer.semantic_analizer.symbol import Symbol
+
 from .mepa_writer import MepaWriter
 from .lexical_analizer.automatas.token import Token
 
@@ -165,9 +167,8 @@ class CommandRulesRecognizer:
             # Verify if identifier is in symbol table
             SemanticErrorAnalyzer.check_var_identifier_is_accesible(identifier_token,symbol_table)
             identifier_signature = identifier_token.getAttribute("name")
-            identifier_symbol,_ = symbol_table.getSymbol(identifier_signature)
-            expected_datatype = identifier_symbol.output_type
-            pending_source_code,current_column,current_row=CommandRulesRecognizer.verify_rest_of_assignation_rule(pending_source_code,current_column,current_row,symbol_table,expected_datatype)
+            identifier_symbol,identifier_symbol_level = symbol_table.getSymbol(identifier_signature)
+            pending_source_code,current_column,current_row=CommandRulesRecognizer.verify_rest_of_assignation_rule(pending_source_code,current_column,current_row,symbol_table,identifier_symbol,identifier_symbol_level)
         elif success_open_par:
             # IMPORTANT: By design decision, only procedure are callable here
             # Verify if there is at least one procedure with the identifier name
@@ -185,7 +186,7 @@ class CommandRulesRecognizer:
         return pending_source_code,current_column,current_row
 
     @staticmethod
-    def verify_rest_of_assignation_rule(pending_source_code:str,current_column:int, current_row:int, symbol_table: SymbolTable,expected_datatype:str) -> Tuple[str,int,int]:
+    def verify_rest_of_assignation_rule(pending_source_code:str,current_column:int, current_row:int, symbol_table: SymbolTable,first_identifier_symbol: Symbol, first_identifier_level) -> Tuple[str,int,int]:
         """
         Identifies rule: <resto_asignacion> ::= { , <identificador> } := <expresion>
             
@@ -199,7 +200,9 @@ class CommandRulesRecognizer:
                 current_column(int): Column where the updated look ahead is
                 current_row(int): Row where the updated look ahead is
         """
-        
+        expected_datatype= first_identifier_symbol.output_type
+        identifers_to_be_set=[]
+        identifers_to_be_set.append(first_identifier_symbol)
         while check_token('TK_comma',pending_source_code,current_column,current_row):
             pending_source_code, current_column, current_row, _, _ = match_token('TK_comma',pending_source_code,current_column,current_row)
             pending_source_code, current_column, current_row, identifier_token, _ = match_token('TK_identifier',pending_source_code,current_column,current_row)
@@ -207,9 +210,23 @@ class CommandRulesRecognizer:
             # Check identifier is in table an is of the expected datatype
             SemanticErrorAnalyzer.check_var_identifier_is_accesible(identifier_token,symbol_table)
             SemanticErrorAnalyzer.check_var_identifier_is_specific_datatype(identifier_token,symbol_table, expected_datatype)
+            identifier_symbol= symbol_table.getSymbol(identifier_token.getAttribute("name"))
+            identifers_to_be_set.append(identifier_symbol)
             pass
         pending_source_code,current_column,current_row,_,_ = match_token('TK_assignment',pending_source_code,current_column,current_row)
         pending_source_code,current_column,current_row,_=ExpresionRulesRecognizer.verify_expresion_rule(pending_source_code,current_column,current_row, symbol_table,expected_datatype)
+        
+        #for id_symbol in identifers_to_be_set:
+            # Preguntar como asignar una misma expresión a múltiples identificadores
+            # MEPA
+            # Assignate the same value to all variables
+
+        #    pass
+
+        # Suponiendo que solo tenemos una variable
+        # MEPA: Assignation to variable
+        CommandRulesRecognizer.mepa_writer.store(first_identifier_level,first_identifier_symbol.offset)
+        
         return pending_source_code,current_column,current_row
     
     pass

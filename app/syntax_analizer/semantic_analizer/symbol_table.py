@@ -195,8 +195,8 @@ class SymbolTable:
             pass
         return response
 
-    def add_return_slot(self,return_symbol: Symbol):
-        return_symbol.offset=-1
+    def add_return_slot(self,return_symbol: Symbol, parameter_list_len: int):
+        return_symbol.offset=0-parameter_list_len-3
         self.scope_content[return_symbol.get_signature()]=return_symbol
         pass
     

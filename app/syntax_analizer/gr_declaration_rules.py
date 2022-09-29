@@ -343,10 +343,10 @@ class DeclarationRulesRecognizer:
         
 
         # Add function name as var
-        
+        function_symbol_table.add_return_slot(Symbol("VAR",identifier_token.getAttribute("name"),[],function_symbol.output_type,0,function_symbol.line),len(parameters_symbols))
         function_symbol_table.add_parameters(parameters_symbols)
         function_symbol_table.add_recursion_call(function_symbol)
-        function_symbol_table.add_return_slot(Symbol("VAR",identifier_token.getAttribute("name"),[],function_symbol.output_type,-1,function_symbol.line))
+        
         
 
         pending_source_code,current_column, current_row,_,_=match_token('TK_semicolon',pending_source_code,current_column, current_row)
