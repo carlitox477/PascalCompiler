@@ -72,7 +72,7 @@ class ExpresionRulesRecognizer:
         pending_source_code,current_column,current_row,_,_ = match_token('TK_write',pending_source_code,current_column,current_row)
         pending_source_code,current_column,current_row,_,_ = match_token('TK_parenthesis',pending_source_code,current_column,current_row,{"type": ['OPPAR']})
 
-        pending_source_code,current_column,current_row,_=ExpresionRulesRecognizer.verify_expresion_list_rule(pending_source_code,current_column,current_row,symbol_table)
+        pending_source_code,current_column,current_row,_=ExpresionRulesRecognizer.verify_expresion_list_rule(pending_source_code,current_column,current_row,symbol_table,True)
         
         pending_source_code,current_column,current_row,_,_ = match_token('TK_parenthesis',pending_source_code,current_column,current_row,{"type": ['CLPAR']})
         return pending_source_code,current_column,current_row
@@ -364,7 +364,8 @@ class ExpresionRulesRecognizer:
                 
                 # MEPA
                 # push variable
-                ExpresionRulesRecognizer.mepa_writer.push_v(var_level,var_symbol.offset)
+                print(f"VAR SIGNATURE:{var_signature}")
+                ExpresionRulesRecognizer.mepa_writer.push_v(var_level,f"{var_symbol.offset} {var_signature}")
 
                 pass
             
@@ -418,7 +419,7 @@ class ExpresionRulesRecognizer:
         raise SyntaxException(f"SYNTAX ERROR: Expected to find a token in {valid_first_tokens}, but found other in row {current_row}, column {current_column}")
 
     @staticmethod
-    def verify_expresion_list_rule(pending_source_code:str,current_column:int, current_row:int, symbol_table: SymbolTable) -> Tuple[str,int,int]:
+    def verify_expresion_list_rule(pending_source_code:str,current_column:int, current_row:int, symbol_table: SymbolTable, is_write= False) -> Tuple[str,int,int]:
         # DONE
         """
         Identifies rule: <lista_de_expresiones> ::= <expresion_simple> { , <expresion_simple> }
@@ -446,9 +447,13 @@ class ExpresionRulesRecognizer:
             except SyntaxException:
                 success_comma = False
                 pass
+            if(is_write):
+                    # MEPA write IMPR:
+                    ExpresionRulesRecognizer.mepa_writer.write()
             if success_comma:
                 pending_source_code,current_column, current_row,expression_datatype=ExpresionRulesRecognizer.verify_simple_expresion_rule(pending_source_code,current_column, current_row,symbol_table)
                 datatype_list.append(expression_datatype)
+                
             pass
         return pending_source_code,current_column, current_row,datatype_list
 

@@ -3,33 +3,38 @@
 		DSVS l0_ejemplo()[0]
 l1_p(INTEGER, INTEGER)[1]		ENPR 1
 		RMEM 1
-		APVL 1, -4
+		APVL 1, -4 n
 		APCT 2
 		CMME
-		APVL 1, -3
-		APVL 1, -4
+		APVL 1, -3 g
+		APVL 1, -4 n
 		SUMA
 		ALVL 1, 0
-		APVL 1, 0
-		APVL 1, -3
+		APVL 1, 0 h
+		IMPR
+		APVL 1, 0 h
+		IMPR
+		APVL 1, -3 g
 		ALVL 1, 0
-		APVL 1, -4
+		APVL 1, -4 n
 		APCT 1
 		SUST
-		APVL 1, 0
-		APVL 1, 0
+		APVL 1, 0 h
+		APVL 1, 0 h
 		ALVL 0, 0
-		APVL 1, -4
+		APVL 1, -4 n
 		APCT 2
 		SUST
-		APVL 1, -3
-		APVL 1, -4
-		APVL 1, -3
+		APVL 1, -3 g
+		APVL 1, -4 n
+		IMPR
+		APVL 1, -3 g
+		IMPR
 		LMEM 1
 l0_ejemplo()[0]		NADA
 		APCT 0
 		ALVL 0, 0
 		APCT 3
-		APVL 0, 0
+		APVL 0, 0 k
 		LMEM 1
 		PARA
