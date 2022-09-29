@@ -14,6 +14,7 @@ l1_func(INTEGER, INTEGER)[1]		ENPR 1
 		RTPR 1, 2
 l0_java()[0]		NADA
 		APCT 2
+		UMEN
 		APCT 3
 		APCT 4
 		APCT 5

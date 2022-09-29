@@ -176,17 +176,25 @@ class ExpresionRulesRecognizer:
         # If [+|-] are found, both termino must be integer type and "or" is not allowed
         # If [+|-] are not found and first <termino> is boolean, or is the only option, and secondo <termino> must be boolean
         
+        do_uminus=False
         try:
             pending_source_code,current_column, current_row,arithmetical_operation_token,_ = match_token('TK_arithOp',pending_source_code,current_column, current_row,{"operation":['ADD', 'SUB']})
             SemanticErrorAnalyzer.check_correct_math_operation(expected_datatype,arithmetical_operation_token)
+            do_uminus = (arithmetical_operation_token.getAttribute("operation")=="SUB")
         except SyntaxException:
             # Ignore if mismatch
             pass
         from_row=current_row
         from_col=current_column
-        #print(mepa_writer)
-        pending_source_code,current_column, current_row,first_term_datatype=ExpresionRulesRecognizer.verify_term_rule(pending_source_code,current_column, current_row,symbol_table,expected_datatype)
+        pending_source_code,current_column, current_row,first_term_datatype=ExpresionRulesRecognizer.verify_term_rule(pending_source_code,current_column, current_row,symbol_table,expected_datatype,do_uminus)
         
+        
+        #if(do_uminus):
+            # MEPA: write uminus 
+        #    print(pending_source_code[:10])
+        #    ExpresionRulesRecognizer.mepa_writer.uminus()
+        #    pass
+
         # Boolean with boolean, integer with integer
         if(expected_datatype != None and expected_datatype!=first_term_datatype):
             raise SemanticException(f"SEMANTIC ERROR: Expected term type {expected_datatype}, but it is {first_term_datatype} in (r:{from_row},c:{from_col})-(r:{current_row},c:{current_column})")
@@ -222,7 +230,7 @@ class ExpresionRulesRecognizer:
         return pending_source_code,current_column, current_row, first_term_datatype
 
     @staticmethod
-    def verify_term_rule(pending_source_code:str,current_column:int, current_row:int, symbol_table: SymbolTable, expected_datatype=None) -> Tuple[str,int,int]:
+    def verify_term_rule(pending_source_code:str,current_column:int, current_row:int, symbol_table: SymbolTable, expected_datatype=None, do_uminus=False) -> Tuple[str,int,int]:
         # DONE
         """
         Identifies rule: <termino> ::= <factor> { ( * | / | and ) <factor> }
@@ -240,12 +248,15 @@ class ExpresionRulesRecognizer:
 
         # First factor type determines if we want an "and" or not, and second factor type
         from_row,from_col=current_row,current_column
-        #print(symbol_table.to_string())
-        #print(f"228 - {mepa_writer}")
         pending_source_code,current_column, current_row,first_factor_datatype=ExpresionRulesRecognizer.verify_factor_rule(pending_source_code,current_column, current_row,symbol_table)
         if(expected_datatype!= None and expected_datatype!=first_factor_datatype):
             raise SemanticException(f"SEMANTIC ERROR: Expected factor type {expected_datatype}, but it is {first_factor_datatype} in (r:{from_row},c:{from_col})-(r:{current_row},c:{current_column})")
         
+        if(do_uminus):
+            # This is put here just to match testcase, it could be put in expersion
+            ExpresionRulesRecognizer.mepa_writer.uminus()
+            pass
+
         success_valid_tk_arith_op=check_token('TK_arithOp',pending_source_code,current_column, current_row,{"operation":['MUL', 'DIV']})
         success_tk_and=check_token('TK_and',pending_source_code,current_column, current_row)
         
