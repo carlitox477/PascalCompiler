@@ -324,7 +324,6 @@ class ExpresionRulesRecognizer:
 
             if success_open_par:
                 # Function
-                #print(mepa_writer)
                 pending_source_code,current_column, current_row,parameters_datatypes=ExpresionRulesRecognizer.verify_rest_of_function_call_rule(pending_source_code,current_column, current_row,symbol_table, identifier_token)
                 SemanticErrorAnalyzer.check_function_or_procedure_is_accesible(identifier_token,parameters_datatypes,symbol_table)
                 function_signature= get_signature(identifier_token.getAttribute("name"),parameters_datatypes)
@@ -338,8 +337,13 @@ class ExpresionRulesRecognizer:
                 # Look identifier datatype in symbol table
                 SemanticErrorAnalyzer.check_var_identifier_is_accesible(identifier_token,symbol_table)
                 var_signature= identifier_token.getAttribute("name")
-                var_symbol,_=symbol_table.getSymbol(var_signature)
+                var_symbol,var_level=symbol_table.getSymbol(var_signature)
                 output_datatype=var_symbol.output_type
+                
+                # MEPA
+                # push variable
+                ExpresionRulesRecognizer.mepa_writer.push_v(var_level,var_symbol.offset)
+
                 pass
             
             if(expected_datatype!= None and expected_datatype!=output_datatype):
