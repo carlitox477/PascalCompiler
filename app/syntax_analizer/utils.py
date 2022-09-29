@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 from typing import Tuple
+from app.syntax_analizer.mepa_writer import MepaWriter
 
 from app.syntax_analizer.semantic_analizer.symbol import Symbol
 from .lexical_analizer.lexical_analizer import LexicalAnalyzer
@@ -70,3 +71,31 @@ def get_signature(function_or_procedure_name: str, parameters_datatypes:list):
         # Case function has non parameters
         datatypes_str=datatypes_str[:-1]
     return f"{function_or_procedure_name}({datatypes_str})"
+
+def add_mepa_binary_operation(operation_token: Token,mepa_writer: MepaWriter):
+    if(operation_token.getAttribute("name") == "TK_and"):
+        mepa_writer._and()
+    elif(operation_token.getAttribute("name") == "TK_or"):
+        mepa_writer._or()
+    elif(operation_token.getAttribute("name") == "TK_not"):
+        mepa_writer._not()
+    elif(operation_token.getAttribute("operation") == "ADD"):
+        mepa_writer.add()
+    elif(operation_token.getAttribute("operation") == "SUB"):
+        mepa_writer.sub()
+    elif(operation_token.getAttribute("operation") == "MUL"):
+        mepa_writer.mul()
+    elif(operation_token.getAttribute("operation") == "EQ"):
+        mepa_writer.eq()
+    elif(operation_token.getAttribute("operation") == "LT"):
+        mepa_writer.lt()
+    elif(operation_token.getAttribute("operation") == "DIF"):
+        mepa_writer.neq()
+    elif(operation_token.getAttribute("operation") == "LEQ"):
+        mepa_writer.leq()
+    elif(operation_token.getAttribute("operation") == "GT"):
+        mepa_writer.gt()
+    elif(operation_token.getAttribute("operation") == "GEQ"):
+        mepa_writer.gte()
+    
+    pass

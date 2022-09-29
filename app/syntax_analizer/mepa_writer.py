@@ -26,7 +26,7 @@ class MepaWriter:
                 1. HEAP[TOP - 1] = HEAP[TOP - 1] + HEAP[TOP ]
                 2. TOP = TOP - 1
         """
-        self.file.write(f"{MepaWriter.padding}ADD\n")
+        self.file.write(f"{MepaWriter.padding}SUMA\n")
         pass
 
     def sub(self):

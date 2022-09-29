@@ -1,7 +1,7 @@
 from typing import Tuple
 
 from .mepa_writer import MepaWriter
-from .utils import get_signature
+from .utils import add_mepa_binary_operation, get_signature
 from .lexical_analizer.automatas.token import Token
 from .semantic_analizer.semantic_exception import SemanticException
 from .semantic_error_analizer import SemanticErrorAnalyzer
@@ -147,8 +147,12 @@ class ExpresionRulesRecognizer:
                 #print(mepa_writer)
                 pending_source_code,current_column, current_row,next_datatype=ExpresionRulesRecognizer.verify_simple_expresion_rule(pending_source_code,current_column, current_row,first_expresion_datatype)
                 #pending_source_code,current_column, current_row,second_expresion_datatype=ExpresionRulesRecognizer.verify_simple_expresion_rule(pending_source_code,current_column, current_row,first_expresion_datatype)
-                # SemanticErrorAnalyzer.check_comparison_datatypes(first_expresion_datatype,second_expresion_datatype, relop_token)
+                SemanticErrorAnalyzer.check_comparison_datatypes(previous_type,next_datatype, relop_token)
                 previous_type= next_datatype
+                
+                # MEPA: wrute relational operation
+                add_mepa_binary_operation(relop_token,ExpresionRulesRecognizer.mepa_writer)
+                
                 perfom_relation_operation= check_token('TK_relOp',pending_source_code,current_column, current_row)
                 pass
         elif(expected_type=="BOOLEAN" and first_expresion_datatype!="BOOLEAN"):
@@ -221,6 +225,10 @@ class ExpresionRulesRecognizer:
             if(term_datatype != first_term_datatype):
                 raise SemanticException(f"SEMANTIC ERROR: Expected term type {first_term_datatype}, but it is {term_datatype} in (r:{from_row},c:{from_col})-(r:{current_row},c:{current_column})")
             #print(pending_source_code)
+            
+            # MEPA: Add operation here
+            add_mepa_binary_operation(operation_token,ExpresionRulesRecognizer.mepa_writer)
+
             success_valid_tk_arith_op=check_token('TK_arithOp',pending_source_code,current_column, current_row,{"operation":['ADD', 'SUB']})
             success_tk_or=check_token('TK_or',pending_source_code,current_column, current_row)
             
@@ -275,6 +283,9 @@ class ExpresionRulesRecognizer:
             if(first_factor_datatype != factor_type):
                 raise SemanticException(f"SEMANTIC ERROR: Expected term type {first_factor_datatype}, but it is {factor_type} in (r:{from_row},c:{from_col})-(r:{current_row},c:{current_column})")
             
+            # MEPA: Add operation here
+            add_mepa_binary_operation(operation_token,ExpresionRulesRecognizer.mepa_writer)
+
             success_valid_tk_arith_op=check_token('TK_arithOp',pending_source_code,current_column, current_row,{"operation":['MUL', 'DIV']})
             success_tk_and=check_token('TK_and',pending_source_code,current_column, current_row)
             pass
@@ -382,12 +393,15 @@ class ExpresionRulesRecognizer:
         # not <factor>
         success_tk_not=True
         try:
-            pending_source_code,current_column, current_row,_,_=match_token('TK_not',pending_source_code,current_column, current_row)
+            pending_source_code,current_column, current_row,not_token,_=match_token('TK_not',pending_source_code,current_column, current_row)
         except SyntaxException:
             success_tk_not = False 
             pass
         if success_tk_not:
             pending_source_code,current_column, current_row,_=ExpresionRulesRecognizer.verify_factor_rule(pending_source_code,current_column, current_row,symbol_table,"BOOLEAN")
+            
+            # MEPA: Add operation here
+            add_mepa_binary_operation(not_token,ExpresionRulesRecognizer.mepa_writer)
             return pending_source_code,current_column, current_row,"BOOLEAN"
 
         # (<expresion>)
