@@ -6,5 +6,7 @@ app/syntax_analizer/__pycache__
 app/syntax_analizer/lexical_analizer/__pycache__
 app/syntax_analizer/lexical_analizer/automatas/__pycache__
 app/semantic_analizer/__pycache__
+app/semantic_analizer/symbol_1
+app/semantic_analizer/symbol_1/*
 .env
 app/pascal-programs
