@@ -159,10 +159,27 @@ class CommandRulesRecognizer:
                 current_column(int): Column where the updated look ahead is
                 current_row(int): Row where the updated look ahead is
         """
+        
+        while_label=CommandRulesRecognizer.mepa_writer.generateLabel()
+        while_end_label=CommandRulesRecognizer.mepa_writer.generateLabel()
+        
+        # MEPA: Add label to while
+        CommandRulesRecognizer.mepa_writer.nop(while_label)
         pending_source_code,current_column,current_row,_,_ = match_token('TK_while',pending_source_code,current_column,current_row)
+
         pending_source_code,current_column,current_row,_= ExpresionRulesRecognizer.verify_expresion_rule(pending_source_code,current_column,current_row,symbol_table,"BOOLEAN")
+        # MEPA: Jump to while end label if expresion is false
+        CommandRulesRecognizer.mepa_writer.jz(while_end_label)
+        
         pending_source_code,current_column,current_row,_,_ = match_token('TK_do',pending_source_code,current_column,current_row)
         pending_source_code,current_column,current_row = CommandRulesRecognizer.verify_command(pending_source_code,current_column,current_row)
+        
+        # MEPA: Jump to begin of while loop always
+        CommandRulesRecognizer.mepa_writer.jmp(while_label)
+
+        # MEPA: Add End of while loop label line
+        CommandRulesRecognizer.mepa_writer.nop(while_end_label)
+
         return pending_source_code,current_column,current_row
 
     @staticmethod
