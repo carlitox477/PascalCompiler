@@ -346,6 +346,9 @@ class ExpresionRulesRecognizer:
 
             if success_open_par:
                 # Function
+                # MEPA: Reserve memory for return
+                ExpresionRulesRecognizer.mepa_writer.malloc(1)
+                
                 pending_source_code,current_column, current_row,parameters_datatypes=ExpresionRulesRecognizer.verify_rest_of_function_call_rule(pending_source_code,current_column, current_row,symbol_table, identifier_token)
                 SemanticErrorAnalyzer.check_function_or_procedure_is_accesible(identifier_token,parameters_datatypes,symbol_table)
                 function_signature= get_signature(identifier_token.getAttribute("name"),parameters_datatypes)
@@ -364,8 +367,8 @@ class ExpresionRulesRecognizer:
                 
                 # MEPA
                 # push variable
-                print(f"VAR SIGNATURE:{var_signature}")
-                ExpresionRulesRecognizer.mepa_writer.push_v(var_level,f"{var_symbol.offset} {var_signature}")
+                # print(f"VAR SIGNATURE:{var_signature}")
+                ExpresionRulesRecognizer.mepa_writer.push_v(var_level,var_symbol.offset)
 
                 pass
             
@@ -483,6 +486,13 @@ class ExpresionRulesRecognizer:
             SemanticErrorAnalyzer.check_function_is_callable(function_identifier_token,expresions_datatypes, symbol_table)
         else:
             SemanticErrorAnalyzer.check_procedure_is_callable(function_identifier_token,expresions_datatypes, symbol_table)
+        
+        # MEPA: add function/procedure call
+        function_procedure_signature=get_signature(function_identifier_token.getAttribute("name"),expresions_datatypes)
+        function_procedure_symbol,_= symbol_table.getSymbol(function_procedure_signature)
+        ExpresionRulesRecognizer.mepa_writer.call(function_procedure_symbol.label)
+
+
         return pending_source_code,current_column, current_row,expresions_datatypes
 
     pass

@@ -11,10 +11,20 @@ class MepaWriter:
     def __init__(self, file: TextIOWrapper) -> None:
         self.top_write_pointer=0
         self.file = file
+        self.label_counter=0
         pass
 
     def close_file(self) -> None:
         self.file.close()
+        pass
+
+    def getNextGeneratedLabel(self):
+        return f"l{self.label_counter}"
+
+    def generateLabel(self):
+        label_to_return= self.label_counter
+        self.label_counter = self.label_counter+1
+        return f"l{label_to_return}"        
         pass
 
     # Artihmetical operations
@@ -205,7 +215,7 @@ class MepaWriter:
         self.file.write(f"{MepaWriter.padding}DSVF {label}\n")
         pass
 
-    def nop(self, label:str ):
+    def nop(self, label: str):
         """
             Write label NADA.
             Do:
@@ -283,7 +293,7 @@ class MepaWriter:
         self.file.write(f"{MepaWriter.padding}INPP\n")
         pass
     
-    def enter(self, procedure_level: int, label: str):
+    def enter(self, label:str, procedure_level: int, comment: str):
         """
             Write ENPR procedure_level.
             Do:
@@ -292,10 +302,10 @@ class MepaWriter:
                 2. HEAP[TOP] = DISPLAY[procedure_level]
                 3. DISPLAY[procedure_level] = TOP + 1
         """
-        self.file.write(f"{label}{MepaWriter.padding}ENPR {procedure_level}\n")
+        self.file.write(f"{label}{MepaWriter.padding}ENPR {procedure_level}{MepaWriter.padding}# {comment}\n")
         pass
     
-    def call(self, procedure_label: int):
+    def call(self, procedure_label: str):
         """
             Write LLPR procedure_level.
             Do:

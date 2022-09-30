@@ -23,6 +23,7 @@ class Symbol:
         self.output_type = output_type
         self.offset = offset
         self.line = line
+        self.label = ""
         pass
 
     def get_signature(self):
@@ -44,7 +45,10 @@ class Symbol:
     
     def get_summary(self)-> str:
         """ Gets summary of the symbol """
-        return f"{ self.symbol_type } { self.symbol_name }: <RETURNS: {self.output_type}>; <OFFSET: { self.offset }>"
+        if(self.symbol_type=="VAR"):
+            return f"{ self.symbol_type } { self.symbol_name }: <RETURNS: {self.output_type}>; <OFFSET: { self.offset }>"
+        else:
+            return f"{ self.symbol_type } { self.symbol_name }: <RETURNS: {self.output_type}>; <LABEL: { self.label }>"
     
 
     def get_parameters_summary(self):

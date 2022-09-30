@@ -10,7 +10,7 @@ from .semantic_analizer.symbol_table import SymbolTable
 from .semantic_error_analizer import SemanticErrorAnalyzer
 
 from .syntax_exception import SyntaxException
-from .utils import check_token, match_token, isTokenInList
+from .utils import check_token, get_signature, match_token, isTokenInList
 from .gr_expresions_rules import ExpresionRulesRecognizer
 
 class CommandRulesRecognizer:
@@ -104,9 +104,15 @@ class CommandRulesRecognizer:
                 current_column(int): Column where the updated look ahead is
                 current_row(int): Row where the updated look ahead is
         """
+        # Generate MEPA label to add jump if after end of then statement
+        label=ExpresionRulesRecognizer.mepa_writer.generateLabel()
         pending_source_code,current_column, current_row,_,_ = match_token('TK_if',pending_source_code,current_column, current_row)
         pending_source_code,current_column, current_row,_ = ExpresionRulesRecognizer.verify_expresion_rule(pending_source_code,current_column, current_row,symbol_table,"BOOLEAN")
         
+        # MEPA: add jump instruction if false
+        ExpresionRulesRecognizer.mepa_writer.jz(label)
+
+
         pending_source_code,current_column, current_row,_,_ = match_token('TK_then',pending_source_code,current_column, current_row)
         
         pending_source_code,current_column, current_row = CommandRulesRecognizer.verify_command(pending_source_code,current_column, current_row,symbol_table)
@@ -114,13 +120,28 @@ class CommandRulesRecognizer:
         success_tk_else = True
 
         try:
-            
             pending_source_code,current_column, current_row,_,_=match_token('TK_else',pending_source_code,current_column, current_row)
         except SyntaxException:
             success_tk_else= False
         if success_tk_else:
+            # MEPA Given there is an else command, we need to know where to jump after else and add
+            # Jump if we achieve this mepa line
+            after_conditional_label=CommandRulesRecognizer.mepa_writer.generateLabel()
+            CommandRulesRecognizer.mepa_writer.jmp(after_conditional_label)
+
+            # MEPA: After then add label line, so if FALSE Jump here
+            ExpresionRulesRecognizer.mepa_writer.nop(label)
+
             pending_source_code,current_column, current_row=CommandRulesRecognizer.verify_command(pending_source_code,current_column, current_row,symbol_table)
+            
+            # MEPA: after conditional label
+            ExpresionRulesRecognizer.mepa_writer.nop(after_conditional_label)
+        else:
+            # MEPA: After then add label line, so if FALSE Jump here
+            ExpresionRulesRecognizer.mepa_writer.nop(label)
             pass
+        
+        
         return pending_source_code,current_column, current_row
 
     @staticmethod
@@ -176,11 +197,15 @@ class CommandRulesRecognizer:
             # Get expresion datatypes to see if there is a function with the correct signature, otherwise raise error
             
             pending_source_code,current_column, current_row,parameters_datatypes= ExpresionRulesRecognizer.verify_rest_of_function_call_rule(pending_source_code,current_column,current_row,symbol_table,identifier_token,True)
-            
 
             # check if procedure is callable
             SemanticErrorAnalyzer.check_procedure_is_callable(identifier_token,parameters_datatypes,symbol_table)
-                  
+            
+            # MEPA: Call procedure
+            #procedure_signature=get_signature(identifier_token.getAttribute("name"),parameters_datatypes)
+            #procedure_symbol,_= symbol_table.getSymbol(procedure_signature)
+            #CommandRulesRecognizer.mepa_writer.call(procedure_symbol.label)
+
             pass
 
         return pending_source_code,current_column,current_row
@@ -210,7 +235,7 @@ class CommandRulesRecognizer:
             # Check identifier is in table an is of the expected datatype
             SemanticErrorAnalyzer.check_var_identifier_is_accesible(identifier_token,symbol_table)
             SemanticErrorAnalyzer.check_var_identifier_is_specific_datatype(identifier_token,symbol_table, expected_datatype)
-            identifier_symbol= symbol_table.getSymbol(identifier_token.getAttribute("name"))
+            identifier_symbol,_= symbol_table.getSymbol(identifier_token.getAttribute("name"))
             identifers_to_be_set.append(identifier_symbol)
             pass
         pending_source_code,current_column,current_row,_,_ = match_token('TK_assignment',pending_source_code,current_column,current_row)

@@ -63,25 +63,18 @@ class SymbolTable:
         return None,-1
     
     def addSymbol(self, symbol_to_add:Symbol):
-        
-        if(self.scope_name== symbol_to_add.symbol_name):
-            symbol_name=symbol_to_add.symbol_name
-            scope_name=self.scope_name
-            scope_level= self.scope_level
-            line = symbol_to_add.line
-            raise SemanticException(f"SEMANTIC ERROR: { symbol_name } in line {line} is has the same name than scope {scope_name}[{scope_level}]")
-
         if self.isInLocalTable(symbol_to_add):
             symbol_name=symbol_to_add.symbol_name
             scope_name=self.scope_name
             scope_level= self.scope_level
             line = symbol_to_add.line
             raise SemanticException(f"{ symbol_name } in line {line} is already added in Symbol Table {scope_name}[{scope_level}]")
+        
         symbol_to_add.offset=self.offset
         
         self.scope_content[symbol_to_add.get_signature()]=symbol_to_add
-        if(symbol_to_add.symbol_type=="VAR"):    
-            self.offset=self.offset+1
+        
+        self.offset=self.offset+1
         pass
     
     def add_parameters(self,parameters:list):

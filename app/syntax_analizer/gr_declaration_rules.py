@@ -28,28 +28,28 @@ class DeclarationRulesRecognizer:
                 current_column(int): Column where the updated look ahead is
                 current_row(int): Row where the updated look ahead is
         """
-        if(not(is_program)):
-            # Function or procedure first instruction must be ENPR:
-            DeclarationRulesRecognizer.mepa_writer.enter(symbol_table.scope_level,symbol_table.get_label())
-
+        
+        #if(not(is_program)):
+        #    # Function or procedure first instruction must be ENPR:
+        #    function_or_procedure_comment=f"{symbol_table.scope_name}({symbol_table.get_parameter_list_str()})[{symbol_table.scope_level}]"
+        #    DeclarationRulesRecognizer.mepa_writer.enter(symbol_table.label,symbol_table.scope_level,function_or_procedure_comment)
+            
 
 
         pending_source_code,current_column, current_row,len_symbols_added=DeclarationRulesRecognizer.verify_variables_declaration_part_rule(pending_source_code,current_column, current_row,symbol_table)
         
         if(is_program):
-            DeclarationRulesRecognizer.mepa_writer.jmp(symbol_table.get_label())
+            label = DeclarationRulesRecognizer.mepa_writer.generateLabel()
+            symbol_table.label=label
+            DeclarationRulesRecognizer.mepa_writer.jmp(symbol_table.label)
         pending_source_code,current_column, current_row=DeclarationRulesRecognizer.verify_subrutine_declaration_part_rule(pending_source_code,current_column, current_row,symbol_table)
 
         if(is_program):
-            DeclarationRulesRecognizer.mepa_writer.nop(symbol_table.get_label())
+            DeclarationRulesRecognizer.mepa_writer.nop(symbol_table.label)
         pending_source_code,current_column, current_row=CommandRulesRecognizer.verify_compound_command_rule(pending_source_code,current_column, current_row,symbol_table)
         
         # Free memory
         DeclarationRulesRecognizer.mepa_writer.free(len_symbols_added)
-        if(symbol_table.scope_type=="FUNCTION"):
-            # Add return instruction
-            DeclarationRulesRecognizer.mepa_writer._return(symbol_table.scope_level,len(symbol_table.paramters_types))
-
         return pending_source_code,current_column, current_row
     
     @staticmethod
@@ -283,13 +283,24 @@ class DeclarationRulesRecognizer:
         
         symbol_table.addSymbol(procedure_symbol)
         procedure_symbol_table.add_parameters(parameters_symbols)
-        procedure_symbol_table.add_recursion_call(procedure_symbol)
+        # procedure_symbol_table.add_recursion_call(procedure_symbol)
 
         pending_source_code,current_column, current_row,_,_=match_token('TK_semicolon',pending_source_code,current_column, current_row)
         
-        
+        # MEPA add procedure label
+        label = DeclarationRulesRecognizer.mepa_writer.generateLabel()
+        procedure_symbol.label=label
+        procedure_symbol_table.label=label
+        procedure_comment=f"{procedure_symbol_table.scope_name}({procedure_symbol_table.get_parameter_list_str()})[{procedure_symbol_table.scope_level}]"
+        DeclarationRulesRecognizer.mepa_writer.enter(procedure_symbol_table.label,procedure_symbol_table.scope_level,procedure_comment)
+           
+
+
         pending_source_code,current_column, current_row=DeclarationRulesRecognizer.verify_block_rule(pending_source_code,current_column, current_row, procedure_symbol_table)
         
+        # MEPA: return from procedure
+        DeclarationRulesRecognizer.mepa_writer._return(procedure_symbol_table.scope_level,procedure_symbol.get_number_of_parameters())
+
         print("---------------------")
         print(procedure_symbol_table.to_string())
         return pending_source_code,current_column, current_row
@@ -345,14 +356,26 @@ class DeclarationRulesRecognizer:
         # Add function name as var
         function_symbol_table.add_return_slot(Symbol("VAR",identifier_token.getAttribute("name"),[],function_symbol.output_type,0,function_symbol.line),len(parameters_symbols))
         function_symbol_table.add_parameters(parameters_symbols)
-        function_symbol_table.add_recursion_call(function_symbol)
+        # function_symbol_table.add_recursion_call(function_symbol)
         
         
 
         pending_source_code,current_column, current_row,_,_=match_token('TK_semicolon',pending_source_code,current_column, current_row)
         
+        # MEPA add function label
+        label = DeclarationRulesRecognizer.mepa_writer.generateLabel()
+        function_symbol.label=label
+        function_symbol_table.label=label
+        function_or_procedure_comment=f"{function_symbol_table.scope_name}({function_symbol_table.get_parameter_list_str()})[{function_symbol_table.label}]"
+        DeclarationRulesRecognizer.mepa_writer.enter(symbol_table.label,symbol_table.scope_level,function_or_procedure_comment)
+            
+
         pending_source_code,current_column, current_row=DeclarationRulesRecognizer.verify_block_rule(pending_source_code,current_column, current_row, function_symbol_table)
         
+        # MEPA: return from procedure
+        DeclarationRulesRecognizer.mepa_writer._return(function_symbol_table.scope_level,function_symbol.get_number_of_parameters())
+
+
         print("---------------------")
         print(function_symbol_table.to_string())
         return pending_source_code,current_column, current_row

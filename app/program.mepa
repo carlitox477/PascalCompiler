@@ -1,40 +1,34 @@
 		INPP
 		RMEM 1
-		DSVS l0_ejemplo()[0]
-l1_p(INTEGER, INTEGER)[1]		ENPR 1
+		DSVS l0
+l0		ENPR 0		# func()[l1]
 		RMEM 1
-		APVL 1, -4 n
-		APCT 2
-		CMME
-		APVL 1, -3 g
-		APVL 1, -4 n
-		SUMA
-		ALVL 1, 0
-		APVL 1, 0 h
-		IMPR
-		APVL 1, 0 h
-		IMPR
-		APVL 1, -3 g
-		ALVL 1, 0
-		APVL 1, -4 n
-		APCT 1
-		SUST
-		APVL 1, 0 h
-		APVL 1, 0 h
-		ALVL 0, 0
-		APVL 1, -4 n
-		APCT 2
-		SUST
-		APVL 1, -3 g
-		APVL 1, -4 n
-		IMPR
-		APVL 1, -3 g
-		IMPR
-		LMEM 1
-l0_ejemplo()[0]		NADA
-		APCT 0
-		ALVL 0, 0
 		APCT 3
-		APVL 0, 0 k
+		ALVL 1, 0
+		APVL 1, 0
+		APVL 1, -4
+		MULT
+		APVL 1, -3
+		SUMA
+		ALVL 1, -5
+		LMEM 1
+		RTPR 1, 2
+l0		NADA
+		APCT 2
+		UMEN
+		APCT 3
+		APCT 4
+		SUMA
+		MULT
+		APCT 5
+		APCT 4
+		SUMA
+		MULT
+		RMEM 1
+		APCT 3
+		APCT 4
+		LLPR l1
+		MULT
+		ALVL 0, 0
 		LMEM 1
 		PARA
