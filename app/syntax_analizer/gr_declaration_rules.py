@@ -71,7 +71,7 @@ class DeclarationRulesRecognizer:
             pending_source_code,current_column, current_row,_,_=match_token('TK_var',pending_source_code,current_column, current_row)
         except SyntaxException:
             # # Assume non var declaration
-            return pending_source_code,current_column, current_row
+            return pending_source_code,current_column, current_row,0
         len_symbols_to_add=0
         # At least one line of variables declaration
         pending_source_code,current_column, current_row,symbols_to_add=DeclarationRulesRecognizer.verify_variables_declaration_rule(pending_source_code,current_column, current_row,symbol_table,True)    

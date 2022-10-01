@@ -172,7 +172,7 @@ class CommandRulesRecognizer:
         CommandRulesRecognizer.mepa_writer.jz(while_end_label)
         
         pending_source_code,current_column,current_row,_,_ = match_token('TK_do',pending_source_code,current_column,current_row)
-        pending_source_code,current_column,current_row = CommandRulesRecognizer.verify_command(pending_source_code,current_column,current_row)
+        pending_source_code,current_column,current_row = CommandRulesRecognizer.verify_command(pending_source_code,current_column,current_row,symbol_table)
         
         # MEPA: Jump to begin of while loop always
         CommandRulesRecognizer.mepa_writer.jmp(while_label)

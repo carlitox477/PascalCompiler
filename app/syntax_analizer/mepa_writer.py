@@ -307,7 +307,7 @@ class MepaWriter:
     
     def call(self, procedure_label: str):
         """
-            Write LLPR procedure_level.
+            Write LLPR procedure_label.
             Do:
                 
                 1. TOP = TOP + 1
